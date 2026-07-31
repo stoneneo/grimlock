@@ -3,23 +3,23 @@ Gorilla Soft - Grimlock
 
 ![Grimlock Logo](resources/grimlock.png)
 
-# What is Grimlock?
-It is a set of libraries and utilities for PHP.
+# ¿Qué es Grimlock?
+Es un conjunto de librerias y utilidades para PHP.
 
-# Capabilities
+# Capacidades
 
-* REST Client
-* PDF Generation from HTML
-* Firebase Push Notifications
-* Email Sending
+* Cliente REST
+* Generación de PDF en base a HTML
+* Notificaciones Push Firebase
+* Envío de Emails
 * Logging
 
-# Requirements
+# Requisitos
 
-* PHP 8.3 or higher
-* Composer 2.5.5 or higher
+* PHP 8.4 o superior
+* Composer 2.5.5 o superior
 
-# Dependencies
+# Dependencias
 
 * Guzzle
 * DomPDF
@@ -28,33 +28,35 @@ It is a set of libraries and utilities for PHP.
 * Monolog
 * Google Auth
 
-# Recommendations
+# Recomendaciones
 
-Visit the wiki for more information:
-https://github.com/stoneneo/grimlock-php/wiki
+Visita el wiki para mas información:
+https://github.com/GorillaSoft/grimlock-php/wiki
 
-# Installation
+# Instalación
 
-Installation is super easy with [Composer](https://getcomposer.org/):
+La instalación es super facil con [Composer](https://getcomposer.org/):
 
 ```bash
 composer require gorilla-soft/grimlock
 ```
+
+Asegúrese de que el archivo de carga automática de Composer esté cargado.
 
 ```php
 // somewhere early in your project's loading, require the Composer autoloader
 // see: http://getcomposer.org/doc/00-intro.md
 require 'vendor/autoload.php';
 ```
-# How to use
+# Como usar
 
-## 1. Grimlock Firebase - Push Notification with Firebase
+## 1. Grimlock Firebase - Notificación Push con Firebase
 
-You must have the Firebase public key in the resources folder name firebase.json
+Se debe tener en la carpeta resources la public key de firebase con el nombre firebase.json.
 
 
 
-Send a notification to a specific person
+Enviar una notificación a una persona
 
 ```php
 use Grimlock\Module\Notification\Firebase\GrimlockFirebase;
@@ -79,7 +81,7 @@ $notification->image = $urlImage;
 $grimlockFirebase->sendNotification($notification, $person);
 ```
 
-Send a notification to a topic
+Enviar una notificación a personas inscritas en un tópico
 
 ```php
 use Grimlock\Module\Notification\Firebase\GrimlockFirebase;
@@ -102,7 +104,7 @@ $notification->image = $urlImage;
 $grimlockFirebase->sendNotification($notification);
 ```
 
-## 2 Grimlock Pdf - Generate PDF from HTML
+## 2 Grimlock Pdf - Generación de PDF desde HTML
 
 ```php
 use GorillaSoft\Grimlock\Module\Pdf\GrimlockPdf;
@@ -111,10 +113,13 @@ $pathHtml = __DIR__ . '/../resources/template.html.php';
 $pathPdf = __DIR__ . "/../resources";
 $namePdf = "test.pdf";
 
+//Seteamos los valores de las variables que se van a reemplazar en el HTML
 $vars = array("name" => "Test");
 
 $pdf = new GrimlockPdf();
+//Cargamos el HTML y las variables
 $pdf->loadHTML($pathHtml, $vars);
+//Generamos el PDF y nos devuelve la ruta del archivo generado
 $pathFilePdf = $pdf->generatePDF($namePdf, $pathPdf);
 ```
 
@@ -138,10 +143,9 @@ if ($response->getCode() == 200) {
 
 ## 4. Grimlock Logging
 
-It is recommended to keep the log folder outside the public area and grant it write permissions.
+Se recomienda tener la carpeta de log fuera de la zona pública y se le deben dar los permisos de escritura.
 
-GrimlockLog must be initialized with the desired log level and the App name. It only needs to be initialized once.
-
+Se debe inicializar el GrimlockLog con el nivel de log que se desea registrar y el nombre de App. Solo se inicializa una vez.
 ```php
 use GorillaSoft\Grimlock\Core\Log\GrimlockLog;
 use GorillaSoft\Grimlock\Core\Log\Enum\LevelLog;
@@ -160,5 +164,4 @@ GrimlockLog::info(("Message Info"));
 
 ## Licencia
 
-Grimlock PHP is licensed under the MIT License.
-
+Grimlock PHP esta bajo Licencia MIT.
