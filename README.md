@@ -1,12 +1,13 @@
-Gorilla Soft - Grimlock
-======
-
 ![Grimlock Logo](resources/grimlock.png)
 
-# What is Grimlock?
+# Grimlock - Libraries and Utilities for PHP
+
+---
+
+## What is Grimlock?
 It is a set of libraries and utilities for PHP.
 
-# Capabilities
+## Capabilities
 
 * REST Client
 * PDF Generation from HTML
@@ -14,12 +15,12 @@ It is a set of libraries and utilities for PHP.
 * Email Sending
 * Logging
 
-# Requirements
+## Requirements
 
 * PHP 8.3 or higher
 * Composer 2.5.5 or higher
 
-# Dependencies
+## Dependencies
 
 * Guzzle
 * DomPDF
@@ -28,12 +29,12 @@ It is a set of libraries and utilities for PHP.
 * Monolog
 * Google Auth
 
-# Recommendations
+## Recommendations
 
 Visit the wiki for more information:
 https://github.com/stoneneo/grimlock-php/wiki
 
-# Installation
+## Installation
 
 Installation is super easy with [Composer](https://getcomposer.org/):
 
@@ -46,9 +47,9 @@ composer require gorilla-soft/grimlock
 // see: http://getcomposer.org/doc/00-intro.md
 require 'vendor/autoload.php';
 ```
-# How to use
+## How to use
 
-## 1. Grimlock Firebase - Push Notification with Firebase
+### 1. Grimlock Firebase - Push Notification with Firebase
 
 You must have the Firebase public key in the resources folder name firebase.json
 
@@ -102,7 +103,7 @@ $notification->image = $urlImage;
 $grimlockFirebase->sendNotification($notification);
 ```
 
-## 2 Grimlock Pdf - Generate PDF from HTML
+### 2 Grimlock Pdf - Generate PDF from HTML
 
 ```php
 use GorillaSoft\Grimlock\Module\Pdf\GrimlockPdf;
@@ -118,7 +119,7 @@ $pdf->loadHTML($pathHtml, $vars);
 $pathFilePdf = $pdf->generatePDF($namePdf, $pathPdf);
 ```
 
-## 3. Grimlock Rest Client
+### 3. Grimlock Rest Client
 
 ```php
 use Grimlock\Module\RestClient\GrimlockRestClient;
@@ -136,7 +137,7 @@ if ($response->getCode() == 200) {
 
 ```
 
-## 4. Grimlock Logging
+### 4. Grimlock Logging
 
 It is recommended to keep the log folder outside the public area and grant it write permissions.
 
