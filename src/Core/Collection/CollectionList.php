@@ -1,18 +1,18 @@
 <?php
 
-namespace GorillaSoft\Grimlock\Core\Util;
+namespace GorillaSoft\Grimlock\Core\Collection;
 
 use ArrayObject;
-use GorillaSoft\Grimlock\Core\Exception\GrimlockException;
+use GorillaSoft\Grimlock\Core\Exception\CoreException;
 use JsonSerializable;
 
 /**
- * Class GrimlockList
+ * Class CollectionList
  * Class that allows manipulating a list of objects
  * @package Grimlock\Util
  * @author Rubén Darío Huamaní Ucharima
  */
-class GrimlockList extends ArrayObject implements JsonSerializable
+class CollectionList extends ArrayObject implements JsonSerializable
 {
 
     /**
@@ -26,7 +26,7 @@ class GrimlockList extends ArrayObject implements JsonSerializable
     /**
      * @param int $index
      * @return mixed
-     * @throws GrimlockException
+     * @throws CoreException
      */
     public function getItem(int $index): mixed
     {
@@ -36,7 +36,7 @@ class GrimlockList extends ArrayObject implements JsonSerializable
             return $this->offsetGet($index);
         }
 
-        throw new GrimlockException(self::class, "Index Out Of Bounds");
+        throw new CoreException(self::class, "Index Out Of Bounds");
     }
 
     /**

@@ -2,22 +2,22 @@
 
 namespace GorillaSoft\Grimlock\Core\Util;
 
-use GorillaSoft\Grimlock\Core\Exception\GrimlockException;
+use GorillaSoft\Grimlock\Core\Exception\CoreException;
 
 /**
- * class GrimlockUtil
+ * class AppUtil
  * Class with Utilities
  * * @package Grimlock\Util
  * * @author Rubén Darío Huamaní Ucharima
  */
-class GrimlockUtil
+class AppUtil
 {
 
     /**
      * @param string $basePath
      * @param string $path
      * @return string
-     * @throws GrimlockException
+     * @throws CoreException
      */
     public static function resolvePath(string $basePath, string $path): string
     {
@@ -31,7 +31,7 @@ class GrimlockUtil
         $absolute = $basePath . ltrim($path, '/');
         $real = realpath($absolute);
         if ($real === false || !is_readable($real)) {
-            throw new GrimlockException(self::class, "File not readable: $path");
+            throw new CoreException(self::class, "File not readable: $path");
         }
 
         return $real;

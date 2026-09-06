@@ -1,8 +1,8 @@
 <?php
 
-namespace GorillaSoft\Grimlock\Module\RestClient\Bean;
+namespace GorillaSoft\Grimlock\Module\Notification\Whatsapp\Dto;
 
-class GrimlockHeader
+class Person
 {
 
     public string $name {
@@ -13,12 +13,13 @@ class GrimlockHeader
             $this->name = $value;
         }
     }
-    public string $value {
+
+    public string $number {
         get {
-            return $this->value;
+            return $this->number;
         }
         set {
-            $this->value = $value;
+            $this->number = $value;
         }
     }
 

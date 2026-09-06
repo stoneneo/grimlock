@@ -1,10 +1,11 @@
 <?php
-namespace GorillaSoft\Grimlock\Module\Mailer\Bean;
 
-class MailParameter
+namespace GorillaSoft\Grimlock\Module\RestClient\Dto;
+
+class Header
 {
 
-    private string $name {
+    public string $name {
         get {
             return $this->name;
         }
@@ -12,7 +13,7 @@ class MailParameter
             $this->name = $value;
         }
     }
-    private string $value {
+    public string $value {
         get {
             return $this->value;
         }
@@ -22,4 +23,3 @@ class MailParameter
     }
 
 }
-

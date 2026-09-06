@@ -1,4 +1,4 @@
-![Grimlock Logo](resources/grimlock.png)
+![Grimlock Logo](grimlock.png)
 
 # Grimlock - Libraries and Utilities for PHP
 
@@ -106,7 +106,7 @@ $grimlockFirebase->sendNotification($notification);
 ### 2 Grimlock Pdf - Generate PDF from HTML
 
 ```php
-use GorillaSoft\Grimlock\Module\Pdf\GrimlockPdf;
+use GorillaSoft\Grimlock\Module\Pdf\PdfGenerator;
 
 $pathHtml = __DIR__ . '/../resources/template.html.php';
 $pathPdf = __DIR__ . "/../resources";
@@ -114,7 +114,7 @@ $namePdf = "test.pdf";
 
 $vars = array("name" => "Test");
 
-$pdf = new GrimlockPdf();
+$pdf = new PdfGenerator();
 $pdf->loadHTML($pathHtml, $vars);
 $pathFilePdf = $pdf->generatePDF($namePdf, $pathPdf);
 ```
@@ -127,7 +127,7 @@ use Grimlock\Module\RestClient\GrimlockRestClient;
 $grimlockRestClient = new GrimlockRestClient('http://localhost:8080');
 $grimlockRestClient->addHeader('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30');
 
-//Return Object GrimlockResponse
+//Return Object Response
 $response = $grimlockRestClient->get('/customers');
 
 if ($response->getCode() == 200) {
@@ -144,11 +144,11 @@ It is recommended to keep the log folder outside the public area and grant it wr
 GrimlockLog must be initialized with the desired log level and the App name. It only needs to be initialized once.
 
 ```php
-use GorillaSoft\Grimlock\Core\Log\GrimlockLog;
+use GorillaSoft\Grimlock\Core\Log\GrimlockLogger;
 use GorillaSoft\Grimlock\Core\Log\Enum\LevelLog;
 
 $log = __DIR__ . '/../logs/logs.txt';
-GrimlockLog::init($log, LevelLog::Info);
+GrimlockLogger::init($log, LevelLog::Info);
 ```
 
 Luego se puede usar el GrimlockLog para registrar mensajes de log en los niveles correspondientes dependiendo de con que nivel fue instanciada la clase.

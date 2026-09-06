@@ -2,23 +2,23 @@
 
 namespace GorillaSoft\Grimlock\Tests\Module\Util;
 
-use GorillaSoft\Grimlock\Core\Exception\GrimlockException;
-use GorillaSoft\Grimlock\Core\Util\GrimlockList;
+use GorillaSoft\Grimlock\Core\Collection\CollectionList;
+use GorillaSoft\Grimlock\Core\Exception\CoreException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Class GrimlockListTest
+ * Class CollectionListTest
  * @package Grimlock\Test\Util
  */
-class GrimlockListTest extends TestCase
+class CollectionListTest extends TestCase
 {
 
     /**
-     * @throws GrimlockException
+     * @throws CoreException
      */
     public function testGetItem(): void
     {
-        $lArray = new GrimlockList();
+        $lArray = new CollectionList();
         $object = "Object";
         $lArray->append($object);
 
@@ -26,12 +26,12 @@ class GrimlockListTest extends TestCase
     }
 
     /**
-     * @throws GrimlockException
+     * @throws CoreException
      */
     public function testGetItemException(): void
     {
-        $lArray = new GrimlockList();
-        $this->expectException(GrimlockException::class);
+        $lArray = new CollectionList();
+        $this->expectException(CoreException::class);
         $lArray->getItem(1);
     }
 

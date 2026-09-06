@@ -1,10 +1,8 @@
 <?php
-namespace GorillaSoft\Grimlock\Module\Mailer\Bean;
 
-/**
- *
- */
-class MailPerson
+namespace GorillaSoft\Grimlock\Module\Mailer\Dto;
+
+class MailSender
 {
 
     public string $email {
@@ -25,4 +23,3 @@ class MailPerson
     }
 
 }
-

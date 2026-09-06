@@ -1,34 +1,57 @@
 <?php
 
-namespace GorillaSoft\Grimlock\Module\RestClient\Bean;
+namespace GorillaSoft\Grimlock\Module\RestClient\Dto;
 
-use GorillaSoft\Grimlock\Core\Exception\GrimlockException;
+use GorillaSoft\Grimlock\Core\Collection\CollectionList;
+use GorillaSoft\Grimlock\Core\Exception\CoreException;
 use Psr\Http\Message\ResponseInterface;
-use GorillaSoft\Grimlock\Core\Util\GrimlockList;
 
-class GrimlockResponse
+class Response
 {
 
-    private GrimlockList $headers;
-    private int $code;
-    private string $body;
+    public CollectionList $headers {
+        get {
+            return $this->headers;
+        }
+        set {
+            $this->headers = $value;
+        }
+    }
 
-    public static function create(ResponseInterface $response): GrimlockResponse
+    public int $code {
+        get {
+            return $this->code;
+        }
+        set {
+            $this->code = $value;
+        }
+    }
+
+    public string $body {
+        get {
+            return $this->body;
+        }
+        set {
+            $this->body = $value;
+        }
+    }
+
+    public static function create(ResponseInterface $response): Response
     {
         $code = $response->getStatusCode();
-        $headers = new GrimlockList();
+        $headers = new CollectionList();
         foreach ($response->getHeaders() as $name => $values) {
-            $grimlockHeader = new GrimlockHeader();
+            $grimlockHeader = new Header();
             $grimlockHeader->name = $name;
             $grimlockHeader->value = $values[0];
             $headers->append($grimlockHeader);
         }
         $body = $response->getBody()->getContents();
 
-        return new GrimlockResponse($code, $headers, $body);
+        return new Response($code, $headers, $body);
     }
 
-    private function __construct(int $code, GrimlockList $headers, string $body)
+    private function __construct(int $code, CollectionList $headers, string $body)
     {
         $this->code = $code;
         $this->headers = $headers;
@@ -39,7 +62,7 @@ class GrimlockResponse
     {
         $this->code = $response->getStatusCode();
         foreach ($response->getHeaders() as $name => $values) {
-            $grimlockHeader = new GrimlockHeader();
+            $grimlockHeader = new Header();
             $grimlockHeader->name = $name;
             $grimlockHeader->value = $values[0];
             $this->headers->append($grimlockHeader);
@@ -47,15 +70,10 @@ class GrimlockResponse
         $this->body = $response->getBody()->getContents();
     }
 
-    public function getCode(): int
-    {
-        return $this->code;
-    }
-
     /**
-     * @throws GrimlockException
+     * @throws CoreException
      */
-    public function getHeader(string $name): ?GrimlockHeader
+    public function getHeader(string $name): ?Header
     {
         for ($i = 0; $i < $this->headers->getSize(); $i ++)
         {
@@ -65,16 +83,6 @@ class GrimlockResponse
             }
         }
         return null;
-    }
-
-    public function getHeaders(): GrimlockList
-    {
-        return $this->headers;
-    }
-
-    public function getBody(): string
-    {
-        return $this->body;
     }
 
 }

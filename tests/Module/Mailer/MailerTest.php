@@ -2,16 +2,16 @@
 
 namespace GorillaSoft\Grimlock\Tests\Module\Mailer;
 
-use GorillaSoft\Grimlock\Core\Exception\GrimlockException;
+use GorillaSoft\Grimlock\Core\Exception\CoreException;
 use GorillaSoft\Grimlock\Module\Mailer\Core\MailSettings;
-use GorillaSoft\Grimlock\Module\Mailer\GrimlockMailer;
+use GorillaSoft\Grimlock\Module\Mailer\Mailer;
 use PHPUnit\Framework\TestCase;
 
-class GrimlockMailerTest extends TestCase
+class MailerTest extends TestCase
 {
 
     /**
-     * @throws GrimlockException
+     * @throws CoreException
      */
     public function testGrimlockMailerException(): void
     {
@@ -22,8 +22,8 @@ class GrimlockMailerTest extends TestCase
         $mailSettings->password = "demo";
         $mailSettings->mailAuth = true;
         $mailSettings->autoTls = false;
-        $this->expectException(GrimlockException::class);
-        $grimlockMailer = new GrimlockMailer($mailSettings);
+        $this->expectException(CoreException::class);
+        $grimlockMailer = new Mailer($mailSettings);
 
         $this->assertTrue(true);
     }

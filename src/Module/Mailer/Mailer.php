@@ -2,19 +2,19 @@
 
 namespace GorillaSoft\Grimlock\Module\Mailer;
 
-use GorillaSoft\Grimlock\Core\Exception\GrimlockException;
-use GorillaSoft\Grimlock\Core\Util\GrimlockList;
-use GorillaSoft\Grimlock\Module\Mailer\Bean\MailPerson;
-use GorillaSoft\Grimlock\Module\Mailer\Bean\MailSender;
+use GorillaSoft\Grimlock\Core\Collection\CollectionList;
+use GorillaSoft\Grimlock\Core\Exception\CoreException;
 use GorillaSoft\Grimlock\Module\Mailer\Core\MailSettings;
+use GorillaSoft\Grimlock\Module\Mailer\Dto\MailPerson;
+use GorillaSoft\Grimlock\Module\Mailer\Dto\MailSender;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 
 /**
- * Class GrimlockMailer SMTP
+ * Class Mailer SMTP
  * @package Grimlock
  */
-class GrimlockMailer
+class Mailer
 {
 
     private PHPMailer $phpMailer;
@@ -23,25 +23,25 @@ class GrimlockMailer
     /**
      * @param MailSettings $mailSettings
      * @param bool $debug
-     * @throws GrimlockException
+     * @throws CoreException
      */
     public function __construct(MailSettings $mailSettings, bool $debug = false)
     {
         if ($mailSettings->host === '')
         {
-            throw new GrimlockException(self::class,  'Mail Host not found or empty');
+            throw new CoreException(self::class,  'Mail Host not found or empty');
         }
         if ($mailSettings->port === 0)
         {
-            throw new GrimlockException(self::class,  'Mail Port not found or empty');
+            throw new CoreException(self::class,  'Mail Port not found or empty');
         }
         if ($mailSettings->username === '')
         {
-            throw new GrimlockException(self::class,  'Mail User not found or empty');
+            throw new CoreException(self::class,  'Mail User not found or empty');
         }
         if ($mailSettings->password === '')
         {
-            throw new GrimlockException(self::class,  'Mail Pass not found or empty');
+            throw new CoreException(self::class,  'Mail Pass not found or empty');
         }
 
         $this->phpMailer = new PHPMailer();
@@ -63,10 +63,10 @@ class GrimlockMailer
 
     /**
      * Generate Mail
-     * @throws GrimlockException
+     * @throws CoreException
      * @throws Exception
      */
-    public function generateMail(MailSender $sender, MailPerson $address, $subject, $body, GrimlockList $lAddressCc = null, GrimlockList $lAddressBcc = null, GrimlockList $lAttachments = null): void
+    public function generateMail(MailSender $sender, MailPerson $address, $subject, $body, CollectionList $lAddressCc = null, CollectionList $lAddressBcc = null, CollectionList $lAttachments = null): void
     {
         $this->phpMailer->From = $sender->email;
         $this->phpMailer->FromName = $sender->name;
@@ -99,9 +99,9 @@ class GrimlockMailer
 
     /**
      * Generate HTML
-     * @throws GrimlockException
+     * @throws CoreException
      */
-    public function generateHtml($html, GrimlockList $lParameters = null): void
+    public function generateHtml($html, CollectionList $lParameters = null): void
     {
         if($lParameters != null){
             for($i = 0; $i < $lParameters->getSize(); $i++){

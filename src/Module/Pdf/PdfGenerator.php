@@ -4,18 +4,18 @@ namespace GorillaSoft\Grimlock\Module\Pdf;
 
 use Dompdf\Dompdf;
 use Exception;
-use GorillaSoft\Grimlock\Core\Exception\GrimlockException;
-use GorillaSoft\Grimlock\Core\Util\GrimlockUtil;
+use GorillaSoft\Grimlock\Core\Exception\CoreException;
+use GorillaSoft\Grimlock\Core\Util\AppUtil;
 use GorillaSoft\Grimlock\Module\Pdf\Enum\PdfOrientation;
 use GorillaSoft\Grimlock\Module\Pdf\Enum\PdfSize;
 
 /**
- * Class GrimlockPdf
+ * Class PdfGenerator
  * Class that facilitates the use of the DOMPDF library to load HTML and render it as PDF.
  * @package Grimlock
  * @author Rubén Darío Huamaní Ucharima
  */
-class GrimlockPdf
+class PdfGenerator
 {
 
     private Dompdf $pdf;
@@ -37,18 +37,18 @@ class GrimlockPdf
      * @param string $orientation
      * @param array $vars
      * @return void
-     * @throws GrimlockException
+     * @throws CoreException
      */
     public function loadHTML(string $pathHTML, array $vars = [], string $size = PdfSize::A4->value, string $orientation = PdfOrientation::VERTICAL->value): void
     {
         try {
-            $path = GrimlockUtil::resolvePath($this->basePath, $pathHTML);
+            $path = AppUtil::resolvePath($this->basePath, $pathHTML);
             if (PdfSize::tryFrom($size) === null) {
-                throw new GrimlockException(self::class, 'Size PDF not exist');
+                throw new CoreException(self::class, 'Size PDF not exist');
             }
 
             if (PdfOrientation::tryFrom($orientation) === null) {
-                throw new GrimlockException(self::class, 'Orientation PDF not exist');
+                throw new CoreException(self::class, 'Orientation PDF not exist');
             }
 
             $html = $this->renderTemplate($path, $vars);
@@ -58,7 +58,7 @@ class GrimlockPdf
             $this->pdf->render();
 
         } catch (Exception $e) {
-            throw new GrimlockException(self::class, $e->getMessage());
+            throw new CoreException(self::class, $e->getMessage());
         }
     }
 
@@ -66,43 +66,43 @@ class GrimlockPdf
      * @param string $nomPDF
      * @param string $pathPdf
      * @return string
-     * @throws GrimlockException
+     * @throws CoreException
      */
     public function generatePDF(string $nomPDF, string $pathPdf): string
     {
         if ($nomPDF === '') {
-            throw new GrimlockException(self::class, 'Path PDF cannot be null or empty');
+            throw new CoreException(self::class, 'Path PDF cannot be null or empty');
         }
 
         if ($pathPdf === '') {
-            throw new GrimlockException(self::class, 'Name PDF cannot be null or empty');
+            throw new CoreException(self::class, 'Name PDF cannot be null or empty');
         }
         try {
-            $path = GrimlockUtil::resolvePath($this->basePath, $pathPdf);
+            $path = AppUtil::resolvePath($this->basePath, $pathPdf);
             file_put_contents($path.DIRECTORY_SEPARATOR.$nomPDF, $this->pdf->output());
 
             return $path;
         } catch (Exception $e) {
-            throw new GrimlockException(self::class, $e->getMessage());
+            throw new CoreException(self::class, $e->getMessage());
         }
     }
 
     /**
      * @param string $nomPDF
      * @return void
-     * @throws GrimlockException
+     * @throws CoreException
      */
     public function downloadPDF(string $nomPDF = ''): void
     {
         if ($nomPDF === '') {
-            throw new GrimlockException(self::class, 'Name PDF cannot be null or empty');
+            throw new CoreException(self::class, 'Name PDF cannot be null or empty');
         }
 
         try {
             $options = ['MailAttachment' => 1];
             $this->pdf->stream($nomPDF, $options);
         } catch (Exception $e) {
-            throw new GrimlockException(self::class, $e->getMessage());
+            throw new CoreException(self::class, $e->getMessage());
         }
     }
 
@@ -110,18 +110,18 @@ class GrimlockPdf
      * @param string $path
      * @param array $vars
      * @return string
-     * @throws GrimlockException
+     * @throws CoreException
      */
     private function renderTemplate(string $path, array $vars = []): string
     {
         $real = realpath($path);
         if ($real === false || !is_readable($real)) {
-            throw new GrimlockException(self::class, 'Template not readable: ' . $path);
+            throw new CoreException(self::class, 'Template not readable: ' . $path);
         }
 
         $ext = strtolower(pathinfo($real, PATHINFO_EXTENSION));
         if (!in_array($ext, ['php', 'html', 'htm'], true)) {
-            throw new GrimlockException(self::class, 'Invalid template extension: ' . $ext);
+            throw new CoreException(self::class, 'Invalid template extension: ' . $ext);
         }
 
         // --- Templates PHP ---
@@ -135,7 +135,7 @@ class GrimlockPdf
                 if (ob_get_level()) {
                     ob_end_clean();
                 }
-                throw new GrimlockException(self::class, $e->getMessage());
+                throw new CoreException(self::class, $e->getMessage());
             }
 
             return $this->applyVars($html, $vars);
@@ -144,7 +144,7 @@ class GrimlockPdf
         // --- Templates HTML ---
         $html = file_get_contents($real);
         if ($html === false) {
-            throw new GrimlockException(self::class, 'Error reading HTML template');
+            throw new CoreException(self::class, 'Error reading HTML template');
         }
 
         return $this->applyVars($html, $vars);

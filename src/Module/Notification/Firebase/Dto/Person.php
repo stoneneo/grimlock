@@ -1,6 +1,6 @@
 <?php
 
-namespace GorillaSoft\Grimlock\Module\Notification\Firebase\Bean;
+namespace GorillaSoft\Grimlock\Module\Notification\Firebase\Dto;
 
 class Person
 {

@@ -3,18 +3,23 @@
 namespace GorillaSoft\Grimlock\Tests\Module\RestClient;
 
 use PHPUnit\Framework\TestCase;
-use GorillaSoft\Grimlock\Module\RestClient\GrimlockRestClient;
-use GorillaSoft\Grimlock\Core\Exception\GrimlockException;
+use GorillaSoft\Grimlock\Module\RestClient\RestClient;
+use GorillaSoft\Grimlock\Core\Exception\CoreException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use GuzzleHttp\Client;
+use ReflectionProperty;
+use Exception;
 
-class GrimlockRestClientTest extends TestCase
+class RestClientTest extends TestCase
 {
+    /**
+     * @throws CoreException
+     */
     public function testGetReturnsGrimlockResponse(): void
     {
         $baseUri = 'https://api.test';
-        $client = new GrimlockRestClient($baseUri, 2, false);
+        $client = new RestClient($baseUri, 2, false);
         $client->addHeader('X-Test', 'value');
 
         $mockStream = $this->createMock(StreamInterface::class);
@@ -43,20 +48,23 @@ class GrimlockRestClientTest extends TestCase
             )
             ->willReturn($mockResponse);
 
-        $ref = new \ReflectionProperty(GrimlockRestClient::class, 'client');
+        $ref = new ReflectionProperty(RestClient::class, 'client');
         $ref->setAccessible(true);
         $ref->setValue($client, $mockGuzzle);
 
         $resp = $client->get('/resource', ['a' => 'b']);
 
-        $this->assertEquals(200, $resp->getCode());
-        $this->assertEquals('{"ok":true}', $resp->getBody());
+        $this->assertEquals(200, $resp->code);
+        $this->assertEquals('{"ok":true}', $resp->body);
     }
 
+    /**
+     * @throws CoreException
+     */
     public function testPostSendsJsonAndReturnsResponse(): void
     {
         $baseUri = 'https://api.test';
-        $client = new GrimlockRestClient($baseUri);
+        $client = new RestClient($baseUri);
 
         $mockStream = $this->createMock(StreamInterface::class);
         $mockStream->method('getContents')->willReturn('ok');
@@ -81,20 +89,23 @@ class GrimlockRestClientTest extends TestCase
             )
             ->willReturn($mockResponse);
 
-        $ref = new \ReflectionProperty(GrimlockRestClient::class, 'client');
+        $ref = new ReflectionProperty(RestClient::class, 'client');
         $ref->setAccessible(true);
         $ref->setValue($client, $mockGuzzle);
 
         $resp = $client->post('/create', ['name' => 'john']);
 
-        $this->assertEquals(201, $resp->getCode());
-        $this->assertEquals('ok', $resp->getBody());
+        $this->assertEquals(201, $resp->code);
+        $this->assertEquals('ok', $resp->body);
     }
 
+    /**
+     * @throws CoreException
+     */
     public function testPutSendsJsonAndReturnsResponse(): void
     {
         $baseUri = 'https://api.test';
-        $client = new GrimlockRestClient($baseUri);
+        $client = new RestClient($baseUri);
 
         $mockStream = $this->createMock(StreamInterface::class);
         $mockStream->method('getContents')->willReturn('updated');
@@ -119,28 +130,28 @@ class GrimlockRestClientTest extends TestCase
             )
             ->willReturn($mockResponse);
 
-        $ref = new \ReflectionProperty(GrimlockRestClient::class, 'client');
+        $ref = new ReflectionProperty(RestClient::class, 'client');
         $ref->setAccessible(true);
         $ref->setValue($client, $mockGuzzle);
 
         $resp = $client->put('/update', ['id' => 1]);
 
-        $this->assertEquals(200, $resp->getCode());
-        $this->assertEquals('updated', $resp->getBody());
+        $this->assertEquals(200, $resp->code);
+        $this->assertEquals('updated', $resp->body);
     }
 
     public function testRequestErrorThrowsGrimlockException(): void
     {
-        $this->expectException(GrimlockException::class);
+        $this->expectException(CoreException::class);
 
-        $client = new GrimlockRestClient('https://api.test');
+        $client = new RestClient('https://api.test');
 
         $mockGuzzle = $this->createMock(Client::class);
         $mockGuzzle->expects($this->once())
             ->method('request')
-            ->will($this->throwException(new \Exception('network')));
+            ->will($this->throwException(new Exception('network')));
 
-        $ref = new \ReflectionProperty(GrimlockRestClient::class, 'client');
+        $ref = new ReflectionProperty(RestClient::class, 'client');
         $ref->setAccessible(true);
         $ref->setValue($client, $mockGuzzle);
 

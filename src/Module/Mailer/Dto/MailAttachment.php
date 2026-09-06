@@ -1,6 +1,6 @@
 <?php
 
-namespace GorillaSoft\Grimlock\Module\Mailer\Bean;
+namespace GorillaSoft\Grimlock\Module\Mailer\Dto;
 
 class MailAttachment
 {

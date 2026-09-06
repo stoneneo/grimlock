@@ -18,13 +18,13 @@
     "email": "grimlock-php@gorilla-soft.com"
   },
   "require": {
-    "guzzlehttp/guzzle": "^7.15.1",
+    "guzzlehttp/guzzle": "^7.15.5",
     "ext-pdo": "*",
     "dompdf/dompdf" : "v3.1.6",
     "phpmailer/phpmailer" : "v6.9.1",
     "ext-json": "*",
     "ext-curl": "*",
-    "google/auth": "^1.52.0",
+    "google/auth": "^1.53.0",
     "monolog/monolog": "^3.10.0",
     "php": ">=8.4"
   },

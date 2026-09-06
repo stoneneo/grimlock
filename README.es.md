@@ -1,7 +1,7 @@
 Gorilla Soft - Grimlock
 ======
 
-![Grimlock Logo](resources/grimlock.png)
+![Grimlock Logo](grimlock.png)
 
 # ¿Qué es Grimlock?
 Es un conjunto de librerias y utilidades para PHP.
@@ -107,7 +107,7 @@ $grimlockFirebase->sendNotification($notification);
 ## 2 Grimlock Pdf - Generación de PDF desde HTML
 
 ```php
-use GorillaSoft\Grimlock\Module\Pdf\GrimlockPdf;
+use GorillaSoft\Grimlock\Module\Pdf\PdfGenerator;
 
 $pathHtml = __DIR__ . '/../resources/template.html.php';
 $pathPdf = __DIR__ . "/../resources";
@@ -116,7 +116,7 @@ $namePdf = "test.pdf";
 //Seteamos los valores de las variables que se van a reemplazar en el HTML
 $vars = array("name" => "Test");
 
-$pdf = new GrimlockPdf();
+$pdf = new PdfGenerator();
 //Cargamos el HTML y las variables
 $pdf->loadHTML($pathHtml, $vars);
 //Generamos el PDF y nos devuelve la ruta del archivo generado
@@ -131,7 +131,7 @@ use Grimlock\Module\RestClient\GrimlockRestClient;
 $grimlockRestClient = new GrimlockRestClient('http://localhost:8080');
 $grimlockRestClient->addHeader('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30');
 
-//Return Object GrimlockResponse
+//Return Object Response
 $response = $grimlockRestClient->get('/customers');
 
 if ($response->getCode() == 200) {
@@ -146,12 +146,13 @@ if ($response->getCode() == 200) {
 Se recomienda tener la carpeta de log fuera de la zona pública y se le deben dar los permisos de escritura.
 
 Se debe inicializar el GrimlockLog con el nivel de log que se desea registrar y el nombre de App. Solo se inicializa una vez.
+
 ```php
-use GorillaSoft\Grimlock\Core\Log\GrimlockLog;
+use GorillaSoft\Grimlock\Core\Log\GrimlockLogger;
 use GorillaSoft\Grimlock\Core\Log\Enum\LevelLog;
 
 $log = __DIR__ . '/../logs/logs.txt';
-GrimlockLog::init($log, LevelLog::Info);
+GrimlockLogger::init($log, LevelLog::Info);
 ```
 
 Luego se puede usar el GrimlockLog para registrar mensajes de log en los niveles correspondientes dependiendo de con que nivel fue instanciada la clase.

@@ -2,15 +2,15 @@
 
 namespace GorillaSoft\Grimlock\Tests\Module\Pdf;
 
-use GorillaSoft\Grimlock\Core\Exception\GrimlockException;
-use GorillaSoft\Grimlock\Module\Pdf\GrimlockPdf;
+use GorillaSoft\Grimlock\Core\Exception\CoreException;
+use GorillaSoft\Grimlock\Module\Pdf\PdfGenerator;
 use PHPUnit\Framework\TestCase;
 
-class GrimlockPdfTest extends TestCase
+class PdfGeneratorTest extends TestCase
 {
 
     /**
-     * @throws GrimlockException
+     * @throws CoreException
      */
     public function testGeneratePdf(): void
     {
@@ -19,7 +19,7 @@ class GrimlockPdfTest extends TestCase
         $namePdf = "test.pdf";
         $vars = array("name" => "Test");
 
-        $pdf = new GrimlockPdf();
+        $pdf = new PdfGenerator();
         $pdf->loadHTML($pathHtml, $vars);
         $pathFilePdf = $pdf->generatePDF($namePdf, $pathPdf);
 
