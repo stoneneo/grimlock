@@ -1,16 +1,16 @@
 <?php
 
-namespace GorillaSoft\Grimlock\Core\Util;
+namespace GorillaSoft\Grimlock\Core\Helper;
 
 use GorillaSoft\Grimlock\Core\Exception\CoreException;
 
 /**
- * class AppUtil
+ * class FileHelper
  * Class with Utilities
  * * @package Grimlock\Util
  * * @author Rubén Darío Huamaní Ucharima
  */
-class AppUtil
+class FileHelper
 {
 
     /**

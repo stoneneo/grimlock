@@ -3,9 +3,8 @@
 namespace GorillaSoft\Grimlock\Module\RestClient;
 
 use Exception;
-use GorillaSoft\Grimlock\Core\Collection\CollectionList;
+use GorillaSoft\Grimlock\Core\Collection\StringMap;
 use GorillaSoft\Grimlock\Core\Exception\CoreException;
-use GorillaSoft\Grimlock\Module\RestClient\Dto\Header;
 use GorillaSoft\Grimlock\Module\RestClient\Dto\Response;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -18,7 +17,7 @@ class RestClient
 
     private string $baseUri;
     private int $timeout;
-    private CollectionList $headers;
+    private StringMap $headers;
     private Client $client;
 
     /**
@@ -35,34 +34,24 @@ class RestClient
         ]);
         $this->baseUri = $baseUri;
         $this->timeout = $timeout;
-        $this->headers = new CollectionList();
+        $this->headers = new StringMap();
     }
 
     /**
-     * @param $name
-     * @param $value
+     * @param string $key
+     * @param string $value
      * @return void
      */
-    public function addHeader($name, $value): void
+    public function addHeader(string $key, string $value): void
     {
-        $header = new Header();
-        $header->name = $name;
-        $header->value = $value;
-        $this->headers->append($header);
+        $this->headers->put($key, $value);
     }
 
     /**
-     * @throws CoreException
+     * @return array
      */
     private function getHeaders(): array {
-        $headers = array();
-        for ($i = 0; $i < $this->headers->getSize(); $i++)
-        {
-            $item = $this->headers->getItem($i);
-            $headers[$item->name] = $item->value;
-        }
-
-        return $headers;
+        return $this->headers->toArray();
     }
 
     /**
@@ -77,9 +66,7 @@ class RestClient
                 'timeout' => $this->timeout
             ]);
             return Response::create($response);
-        } catch (Exception $e) {
-            throw new CoreException(self::class, $e->getMessage());
-        } catch (GuzzleException $e) {
+        } catch (Exception|GuzzleException $e) {
             throw new CoreException(self::class, $e->getMessage());
         }
     }
@@ -95,9 +82,7 @@ class RestClient
                'json' => $body
             ]);
             return Response::create($response);
-        } catch (Exception $e) {
-            throw new CoreException(self::class, $e->getMessage());
-        } catch (GuzzleException $e) {
+        } catch (Exception|GuzzleException $e) {
             throw new CoreException(self::class, $e->getMessage());
         }
     }
@@ -113,9 +98,7 @@ class RestClient
                 'json' => $body
             ]);
             return Response::create($response);
-        } catch (Exception $e) {
-            throw new CoreException(self::class, $e->getMessage());
-        } catch (GuzzleException $e) {
+        } catch (Exception|GuzzleException $e) {
             throw new CoreException(self::class, $e->getMessage());
         }
     }

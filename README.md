@@ -115,8 +115,8 @@ $namePdf = "test.pdf";
 $vars = array("name" => "Test");
 
 $pdf = new PdfGenerator();
-$pdf->loadHTML($pathHtml, $vars);
-$pathFilePdf = $pdf->generatePDF($namePdf, $pathPdf);
+$pdf->loadTemplate($pathHtml, $vars);
+$pathFilePdf = $pdf->generate($namePdf, $pathPdf);
 ```
 
 ### 3. Grimlock Rest Client

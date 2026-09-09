@@ -21,6 +21,7 @@ class Notification
             $this->title = $value;
         }
     }
+
     public ?string $body {
         get {
             return $this->body ?? '';
@@ -38,4 +39,5 @@ class Notification
             $this->image = $value;
         }
     }
+
 }

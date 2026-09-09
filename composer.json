@@ -2,7 +2,7 @@
   "name": "gorilla-soft/grimlock",
   "description": "Grimlock - Libraries & Utilities for PHP",
   "homepage": "https://grimlock.gorilla-soft.com",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "library",
   "keywords": [ "gorilla", "soft", "grimlock", "php", "libraries", "utilities" ],
   "license": "GPL-3.0-or-later",
@@ -25,7 +25,7 @@
     "ext-json": "*",
     "ext-curl": "*",
     "google/auth": "^1.53.0",
-    "monolog/monolog": "^3.10.0",
+    "monolog/monolog": "^3.11.0",
     "php": ">=8.4"
   },
   "require-dev": {
@@ -38,7 +38,7 @@
     }
   },
   "scripts": {
-    "test": "vendor/bin/phpunit",
+    "test": "phpunit",
     "coverage": "phpunit --coverage-html=coverage --coverage-text"
   },
   "config": {

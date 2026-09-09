@@ -7,16 +7,17 @@ use GorillaSoft\Grimlock\Core\Exception\CoreException;
 use JsonSerializable;
 
 /**
- * Class CollectionList
+ * Class Collection
  * Class that allows manipulating a list of objects
- * @package Grimlock\Util
+ * @template T
+ * @extends ArrayObject<int, T>
  * @author Rubén Darío Huamaní Ucharima
  */
-class CollectionList extends ArrayObject implements JsonSerializable
+class Collection extends ArrayObject implements JsonSerializable
 {
 
     /**
-     * @return array
+     * @return array<int, T>
      */
     public function jsonSerialize(): array
     {
@@ -25,10 +26,10 @@ class CollectionList extends ArrayObject implements JsonSerializable
 
     /**
      * @param int $index
-     * @return mixed
+     * @return T
      * @throws CoreException
      */
-    public function getItem(int $index): mixed
+    public function get(int $index): mixed
     {
         $size = $this->count();
         if ($index >= 0 && $index < $size)
@@ -40,11 +41,34 @@ class CollectionList extends ArrayObject implements JsonSerializable
     }
 
     /**
+     * @param mixed $item
+     * @return void
+     */
+    public function add(mixed $item): void
+    {
+        $this->append($item);
+    }
+
+    public function remove(int $index): void
+    {
+        $size = $this->count();
+        if ($index >= 0 && $index < $size)
+        {
+            $this->offsetUnset($index);
+        }
+    }
+
+    /**
      * @return int
      */
-    public function getSize(): int
+    public function size(): int
     {
         return $this->count();
+    }
+
+    public function clear(): void
+    {
+        $this->exchangeArray([]);
     }
 
 }

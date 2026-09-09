@@ -5,7 +5,7 @@ namespace GorillaSoft\Grimlock\Module\Mailer\Dto;
 class MailAttachment
 {
 
-    private string $base64 {
+    public string $base64 {
         get {
             return $this->base64;
         }
@@ -13,7 +13,8 @@ class MailAttachment
             $this->base64 = $value;
         }
     }
-    private string $name {
+
+    public string $name {
         get {
             return $this->name;
         }
@@ -21,7 +22,7 @@ class MailAttachment
             $this->name = $value;
         }
     }
-    private string $type {
+    public string $type {
         get {
             return $this->type;
         }

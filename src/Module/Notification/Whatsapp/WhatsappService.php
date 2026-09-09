@@ -2,7 +2,9 @@
 
 namespace GorillaSoft\Grimlock\Module\Notification\Whatsapp;
 
+use GorillaSoft\Grimlock\Core\Collection\StringMap;
 use GorillaSoft\Grimlock\Core\Exception\CoreException;
+use GorillaSoft\Grimlock\Core\Helper\TemplateHelper;
 use GorillaSoft\Grimlock\Module\Notification\Whatsapp\Dto\Person;
 use GorillaSoft\Grimlock\Module\RestClient\RestClient;
 
@@ -20,11 +22,11 @@ class WhatsappService
      */
     public function __construct(string $accessToken, string $phoneNumberId)
     {
-        if ($accessToken === '')
+        if (empty($accessToken))
         {
             throw new CoreException(self::class,  'Access Token empty');
         }
-        if ($phoneNumberId === '')
+        if (empty($phoneNumberId))
         {
             throw new CoreException(self::class,  'Phone Number ID empty');
         }
@@ -35,12 +37,13 @@ class WhatsappService
     /**
      * @param Person $person
      * @param string $message
+     * @param StringMap|null $params
      * @return bool
      * @throws CoreException
      */
-    public function sendMessage(Person $person, string $message): bool
+    public function sendMessage(Person $person, string $message, ?StringMap $params = new StringMap()): bool
     {
-        $responseClient = $this->restClient->post('/messages', $this->getBodyMessage($message, $person));
+        $responseClient = $this->restClient->post('/messages', $this->getBodyMessage($message, $person, $params));
         $httpCode = $responseClient->code;
         if ($httpCode == 200)
             return true;
@@ -67,30 +70,19 @@ class WhatsappService
     /**
      * @param string $message
      * @param Person $person
-     * @return string
-     */
-    private function formatMessage(string $message, Person $person): string
-    {
-        $keys = array('{NAME}');
-        $values = array($person->name);
-
-        return str_replace($keys, $values, $message);
-    }
-
-    /**
-     * @param string $message
-     * @param Person $person
+     * @param StringMap $params
      * @return array
      */
-    private function getBodyMessage(string $message, Person $person): array
+    private function getBodyMessage(string $message, Person $person, StringMap $params): array
     {
+        $body = TemplateHelper::replaceParams($message, $params);
         return array(
             'type' => 'text',
             'to' => $person->number,
             'recipient_type' => 'individual',
             'messaging_product' => 'whatsapp',
             'text' => array(
-                'body' => $this->formatMessage($message, $person)
+                'body' => $body
             )
         );
     }

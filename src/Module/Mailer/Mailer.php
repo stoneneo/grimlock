@@ -2,13 +2,18 @@
 
 namespace GorillaSoft\Grimlock\Module\Mailer;
 
-use GorillaSoft\Grimlock\Core\Collection\CollectionList;
+use GorillaSoft\Grimlock\Core\Collection\Collection;
+use GorillaSoft\Grimlock\Core\Collection\StringMap;
 use GorillaSoft\Grimlock\Core\Exception\CoreException;
+use GorillaSoft\Grimlock\Core\Helper\TemplateHelper;
+use GorillaSoft\Grimlock\Core\Helper\PropertyHelper;
 use GorillaSoft\Grimlock\Module\Mailer\Core\MailSettings;
+use GorillaSoft\Grimlock\Module\Mailer\Dto\MailAttachment;
 use GorillaSoft\Grimlock\Module\Mailer\Dto\MailPerson;
 use GorillaSoft\Grimlock\Module\Mailer\Dto\MailSender;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
+use ReflectionException;
 
 /**
  * Class Mailer SMTP
@@ -24,22 +29,23 @@ class Mailer
      * @param MailSettings $mailSettings
      * @param bool $debug
      * @throws CoreException
+     * @throws ReflectionException
      */
     public function __construct(MailSettings $mailSettings, bool $debug = false)
     {
-        if ($mailSettings->host === '')
+        if (!PropertyHelper::isNotEmpty($mailSettings, 'host'))
         {
             throw new CoreException(self::class,  'Mail Host not found or empty');
         }
-        if ($mailSettings->port === 0)
+        if (!PropertyHelper::isNotEmpty($mailSettings, 'port'))
         {
             throw new CoreException(self::class,  'Mail Port not found or empty');
         }
-        if ($mailSettings->username === '')
+        if (!PropertyHelper::isNotEmpty($mailSettings, 'username'))
         {
             throw new CoreException(self::class,  'Mail User not found or empty');
         }
-        if ($mailSettings->password === '')
+        if (!PropertyHelper::isNotEmpty($mailSettings, 'password'))
         {
             throw new CoreException(self::class,  'Mail Pass not found or empty');
         }
@@ -57,67 +63,95 @@ class Mailer
             $this->phpMailer->SMTPDebug = 2;
         }
         $this->phpMailer->SMTPSecure = 'tls';
-        $this->phpMailer->IsHTML(true);
+        $this->phpMailer->IsHTML();
     }
 
-
     /**
-     * Generate Mail
+     *
+     * @param MailSender $mailSender
+     * @param MailPerson $mailPerson
+     * @param Collection<MailPerson>|null $lAddressCc
+     * @param Collection<MailPerson>|null $lAddressBcc
+     * @param Collection<MailAttachment>|null $lAttachments
      * @throws CoreException
      * @throws Exception
      */
-    public function generateMail(MailSender $sender, MailPerson $address, $subject, $body, CollectionList $lAddressCc = null, CollectionList $lAddressBcc = null, CollectionList $lAttachments = null): void
+    public function addRecipients(MailSender $mailSender, MailPerson $mailPerson, ?Collection $lAddressCc = null, ?Collection $lAddressBcc = null, ?Collection $lAttachments = null): void
     {
-        $this->phpMailer->From = $sender->email;
-        $this->phpMailer->FromName = $sender->name;
-        $this->phpMailer->AddAddress($address->email, $address->name);
+        $this->phpMailer->From = $mailSender->email;
+        $this->phpMailer->FromName = $mailSender->name;
+        $this->phpMailer->AddAddress($mailPerson->email, $mailPerson->name);
 
         if($lAddressCc != null){
-            for ($i = 0; $i < $lAddressCc->getSize(); $i++){
-                $ccAddress = $lAddressCc->getItem($i);
-                $this->phpMailer->addCC($ccAddress->getEMail(), $ccAddress->getName());
+            for ($i = 0; $i < $lAddressCc->size(); $i++){
+                $ccAddress = $lAddressCc->get($i);
+                $this->phpMailer->addCC($ccAddress->email, $ccAddress->name);
             }
         }
         if($lAddressBcc != null){
-            for ($i = 0; $i < $lAddressBcc->getSize(); $i++){
-                $bccAddress = $lAddressBcc->getItem($i);
-                $this->phpMailer->addBCC($bccAddress->getEMail(), $bccAddress->getName());
+            for ($i = 0; $i < $lAddressBcc->size(); $i++){
+                $bccAddress = $lAddressBcc->get($i);
+                $this->phpMailer->addBCC($bccAddress->email, $bccAddress->name);
             }
         }
 
         if($lAttachments != null){
-            for($i = 0; $i < $lAttachments->getSize(); $i++){
-                $bAttachment = $lAttachments->getItem($i);
-                $attachment = base64_decode($bAttachment->getBase64());
-                $this->phpMailer->addStringAttachment($attachment, $bAttachment->getName(), "base64", $bAttachment->getType());
+            for($i = 0; $i < $lAttachments->size(); $i++){
+                $bAttachment = $lAttachments->get($i);
+                $attachment = base64_decode($bAttachment->base64);
+                $this->phpMailer->addStringAttachment($attachment, $bAttachment->name, "base64", $bAttachment->type);
             }
         }
+    }
 
+    /**
+     * Generate Text
+     * @param string $subject
+     * @param string $text
+     * @param StringMap|null $params
+     * @return void
+     */
+    public function addText(string $subject, string $text, ?StringMap $params = null): void
+    {
         $this->phpMailer->Subject = $subject;
-        $this->phpMailer->Body = $body;
+        $this->phpMailer->Body = TemplateHelper::replaceParams($text, $params);
     }
 
     /**
      * Generate HTML
-     * @throws CoreException
+     * @param string $subject
+     * @param string $html
+     * @param StringMap|null $params
      */
-    public function generateHtml($html, CollectionList $lParameters = null): void
+    public function addHtml(string $subject, string $html, ?StringMap $params = null): void
     {
-        if($lParameters != null){
-            for($i = 0; $i < $lParameters->getSize(); $i++){
-                $parameter = $lParameters->getItem($i);
-                $html = str_replace($parameter->getName(), $parameter->getValue(), $html);
-            }
-        }
-
-        $this->phpMailer->Body = $html;
+        $this->phpMailer->Subject = $subject;
+        $this->phpMailer->Body = TemplateHelper::replaceParams($html, $params);
     }
 
     /**
      * @throws Exception
+     * @throws CoreException
+     * @throws ReflectionException
      */
     public function sendMail(): bool
     {
+        if (!PropertyHelper::isNotEmpty($this->phpMailer,'From')) {
+            throw new CoreException(self::class, "From is not set");
+        }
+        if (!PropertyHelper::isNotEmpty($this->phpMailer, 'FromName')) {
+            throw new CoreException(self::class, "FromName is not set");
+        }
+        if ($this->phpMailer->getToAddresses() == null) {
+            throw new CoreException(self::class, "To Addresses are not set");
+        }
+        if (!PropertyHelper::isNotEmpty($this->phpMailer, 'Subject')) {
+            throw new CoreException(self::class, "Subject is not set");
+        }
+        if (!PropertyHelper::isNotEmpty($this->phpMailer, 'Body')) {
+            throw new CoreException(self::class, "Body is not set");
+        }
+
         return $this->phpMailer->send();
     }
 

@@ -2,14 +2,14 @@
 
 namespace GorillaSoft\Grimlock\Module\RestClient\Dto;
 
-use GorillaSoft\Grimlock\Core\Collection\CollectionList;
+use GorillaSoft\Grimlock\Core\Collection\Collection;
 use GorillaSoft\Grimlock\Core\Exception\CoreException;
 use Psr\Http\Message\ResponseInterface;
 
 class Response
 {
 
-    public CollectionList $headers {
+    public Collection $headers {
         get {
             return $this->headers;
         }
@@ -39,7 +39,7 @@ class Response
     public static function create(ResponseInterface $response): Response
     {
         $code = $response->getStatusCode();
-        $headers = new CollectionList();
+        $headers = new Collection();
         foreach ($response->getHeaders() as $name => $values) {
             $grimlockHeader = new Header();
             $grimlockHeader->name = $name;
@@ -51,7 +51,7 @@ class Response
         return new Response($code, $headers, $body);
     }
 
-    private function __construct(int $code, CollectionList $headers, string $body)
+    private function __construct(int $code, Collection $headers, string $body)
     {
         $this->code = $code;
         $this->headers = $headers;
@@ -75,9 +75,9 @@ class Response
      */
     public function getHeader(string $name): ?Header
     {
-        for ($i = 0; $i < $this->headers->getSize(); $i ++)
+        for ($i = 0; $i < $this->headers->size(); $i ++)
         {
-            $header = $this->headers->getItem($i);
+            $header = $this->headers->get($i);
             if ($header->getName() === $name) {
                 return $header;
             }
