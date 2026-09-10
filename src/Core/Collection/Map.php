@@ -12,9 +12,14 @@ use Traversable;
  */
 abstract class Map implements IteratorAggregate
 {
-
+    /**
+     * @var array<string,mixed>
+     */
     protected array $items;
 
+    /**
+     * @param array<string,mixed> $items
+     */
     public function __construct(array $items = [])
     {
         $this->items = $items;
@@ -43,8 +48,7 @@ abstract class Map implements IteratorAggregate
 
     public function isEmpty(): bool
     {
-        if (count($this->items) === 0)
-        {
+        if (count($this->items) === 0) {
             return true;
         }
         return false;
@@ -55,6 +59,9 @@ abstract class Map implements IteratorAggregate
         return new ArrayIterator($this->items);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
         return $this->items;

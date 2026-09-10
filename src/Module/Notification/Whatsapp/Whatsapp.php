@@ -8,9 +8,8 @@ use GorillaSoft\Grimlock\Core\Helper\TemplateHelper;
 use GorillaSoft\Grimlock\Module\Notification\Whatsapp\Dto\Person;
 use GorillaSoft\Grimlock\Module\RestClient\RestClient;
 
-class WhatsappService
+class Whatsapp implements WhatsappInterface
 {
-
     private const string WHATSAPP_URL = 'https://graph.facebook.com/v25.0/';
 
     private RestClient $restClient;
@@ -22,13 +21,11 @@ class WhatsappService
      */
     public function __construct(string $accessToken, string $phoneNumberId)
     {
-        if (empty($accessToken))
-        {
-            throw new CoreException(self::class,  'Access Token empty');
+        if (empty($accessToken)) {
+            throw new CoreException(self::class, 'Access Token empty');
         }
-        if (empty($phoneNumberId))
-        {
-            throw new CoreException(self::class,  'Phone Number ID empty');
+        if (empty($phoneNumberId)) {
+            throw new CoreException(self::class, 'Phone Number ID empty');
         }
         $this->restClient = new RestClient(self::WHATSAPP_URL.$phoneNumberId);
         $this->restClient->addHeader('Authorization', 'Bearer : '.$accessToken);
@@ -37,18 +34,21 @@ class WhatsappService
     /**
      * @param Person $person
      * @param string $message
-     * @param StringMap|null $params
+     * @param StringMap<string>|null $params
      * @return bool
      * @throws CoreException
      */
-    public function sendMessage(Person $person, string $message, ?StringMap $params = new StringMap()): bool
+    public function sendMessage(Person $person, string $message, ?StringMap $params = null): bool
     {
-        $responseClient = $this->restClient->post('/messages', $this->getBodyMessage($message, $person, $params));
+        $params ??= new StringMap();
+
+        $responseClient = $this->restClient->post('messages', $this->getBodyMessage($message, $person, $params));
         $httpCode = $responseClient->code;
-        if ($httpCode == 200)
+        if ($httpCode == 200) {
             return true;
-        else
+        } else {
             return false;
+        }
     }
 
     /**
@@ -59,51 +59,52 @@ class WhatsappService
      */
     public function sendTemplate(Person $person, string $template): bool
     {
-        $responseClient = $this->restClient->post('/messages', $this->getBodyTemplate($template, $person));
+        $responseClient = $this->restClient->post('messages', $this->getBodyTemplate($template, $person));
         $httpCode = $responseClient->code;
-        if ($httpCode == 200)
+        if ($httpCode == 200) {
             return true;
-        else
+        } else {
             return false;
+        }
     }
 
     /**
      * @param string $message
      * @param Person $person
-     * @param StringMap $params
-     * @return array
+     * @param StringMap<string> $params
+     * @return array<string, mixed>
      */
     private function getBodyMessage(string $message, Person $person, StringMap $params): array
     {
         $body = TemplateHelper::replaceParams($message, $params);
-        return array(
+        return [
             'type' => 'text',
             'to' => $person->number,
             'recipient_type' => 'individual',
             'messaging_product' => 'whatsapp',
-            'text' => array(
+            'text' => [
                 'body' => $body
-            )
-        );
+            ]
+        ];
     }
 
     /**
      * @param string $template
      * @param Person $person
-     * @return array
+     * @return array<string,mixed>
      */
     private function getBodyTemplate(string $template, Person $person): array
     {
-        return array(
+        return [
             'type' => 'template',
             'to' => $person->number,
             'recipient_type' => 'individual',
             'messaging_product' => 'whatsapp',
-            'template' => array(
+            'template' => [
                 'name' => $template,
                 'language' => 'es_ES'
-            )
-        );
+            ]
+        ];
     }
 
 }

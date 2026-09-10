@@ -15,7 +15,6 @@ use JsonSerializable;
  */
 class Collection extends ArrayObject implements JsonSerializable
 {
-
     /**
      * @return array<int, T>
      */
@@ -32,9 +31,12 @@ class Collection extends ArrayObject implements JsonSerializable
     public function get(int $index): mixed
     {
         $size = $this->count();
-        if ($index >= 0 && $index < $size)
-        {
-            return $this->offsetGet($index);
+        if ($index >= 0 && $index < $size) {
+            $value = $this->offsetGet($index);
+            if ($value === null) {
+                throw new CoreException(self::class, "Unexpected null value at valid index $index");
+            }
+            return $value;
         }
 
         throw new CoreException(self::class, "Index Out Of Bounds");
@@ -49,11 +51,29 @@ class Collection extends ArrayObject implements JsonSerializable
         $this->append($item);
     }
 
+    /**
+     * @template R
+     * @param callable(T): R $callback
+     * @return array<int, R>
+     */
+    public function map(callable $callback): array
+    {
+        return array_map($callback, $this->getArrayCopy());
+    }
+
+    /**
+     *
+     * @return array<int, T>
+     */
+    public function toArray(): array
+    {
+        return $this->getArrayCopy();
+    }
+
     public function remove(int $index): void
     {
         $size = $this->count();
-        if ($index >= 0 && $index < $size)
-        {
+        if ($index >= 0 && $index < $size) {
             $this->offsetUnset($index);
         }
     }

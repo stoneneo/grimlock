@@ -16,7 +16,7 @@
         <?php
         echo "Hello, " . $name . "! <br />";
         echo '<ul>';
-        foreach($superheroes as $superheroe) {
+        foreach ($superheroes as $superheroe) {
             echo '<li>' . $superheroe->name . '</li>';
         }
         echo '</ul>';

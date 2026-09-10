@@ -5,10 +5,10 @@ namespace GorillaSoft\Grimlock\Tests\Module\Mailer;
 use GorillaSoft\Grimlock\Core\Collection\Collection;
 use GorillaSoft\Grimlock\Core\Collection\StringMap;
 use GorillaSoft\Grimlock\Core\Exception\CoreException;
-use GorillaSoft\Grimlock\Module\Mailer\Core\MailSettings;
-use GorillaSoft\Grimlock\Module\Mailer\Dto\MailAttachment;
-use GorillaSoft\Grimlock\Module\Mailer\Dto\MailPerson;
-use GorillaSoft\Grimlock\Module\Mailer\Dto\MailSender;
+use GorillaSoft\Grimlock\Module\Mailer\Settings\Settings;
+use GorillaSoft\Grimlock\Module\Mailer\Dto\Attachment;
+use GorillaSoft\Grimlock\Module\Mailer\Dto\Person;
+use GorillaSoft\Grimlock\Module\Mailer\Dto\Sender;
 use GorillaSoft\Grimlock\Module\Mailer\Mailer;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
@@ -18,19 +18,12 @@ use ReflectionException;
 
 class MailerTest extends TestCase
 {
-    private MailSettings $validSettings;
+    private Settings $validSettings;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->validSettings = new MailSettings();
-        $this->validSettings->host = 'smtp.gmail.com';
-        $this->validSettings->port = 587;
-        $this->validSettings->username = 'user@gmail.com';
-        $this->validSettings->password = 'secret';
-        $this->validSettings->mailAuth = true;
-        $this->validSettings->autoTls = true;
+        $this->validSettings = new Settings('smtp.gmail.com', 587, 'user@gmail.com', 'secret');
     }
 
     private function getInternalPhpMailer(Mailer $mailer): PHPMailer
@@ -103,36 +96,25 @@ class MailerTest extends TestCase
     {
         $mailer = new Mailer($this->validSettings);
 
-        $sender = new MailSender();
-        $sender->name = 'System Sender';
-        $sender->email = 'sender@test.com';
-        $personTo = new MailPerson();
-        $personTo->name = 'Main Recipient';
-        $personTo->email = 'to@test.com';
+        $sender = new Sender('System Sender', 'sender@test.com');
+        $personTo = new Person('Main Recipient', 'to@test.com');
 
         // CC Collection.php
-        /** @var Collection<MailPerson> $ccList */
+        /** @var Collection<Person> $ccList */
         $ccList = new Collection();
-        $ccPerson = new MailPerson();
-        $ccPerson->name = 'CC User';
-        $ccPerson->email = 'cc@test.com';
+        $ccPerson = new Person('CC User', 'cc@test.com');
         $ccList->append($ccPerson);
 
         // BCC Collection.php
-        /** @var Collection<MailPerson> $bccList */
+        /** @var Collection<Person> $bccList */
         $bccList = new Collection();
-        $bccPerson = new MailPerson();
-        $bccPerson->name = 'BCC User';
-        $bccPerson->email = 'bcc@test.com';
+        $bccPerson = new Person('BCC User', 'bcc@test.com');
         $bccList->append($bccPerson);
 
         // Attachment Collection.php
-        /** @var Collection<MailAttachment> $attachmentList */
+        /** @var Collection<Attachment> $attachmentList */
         $attachmentList = new Collection();
-        $attachment = new MailAttachment();
-        $attachment->name = 'document.pdf';
-        $attachment->base64 = base64_encode('PDF Content Dummy');
-        $attachment->type = 'application/pdf';
+        $attachment = new Attachment('document.pdf', 'application/pdf', 'PDF Content Dummy');
         $attachmentList->append($attachment);
 
         $mailer->addRecipients($sender, $personTo, $ccList, $bccList, $attachmentList);
@@ -221,12 +203,8 @@ class MailerTest extends TestCase
         $property->setAccessible(true);
         $property->setValue($mailer, $phpMailerMock);
 
-        $sender = new MailSender();
-        $sender->name = 'System Sender';
-        $sender->email = 'sender@test.com';
-        $recipient = new MailPerson();
-        $recipient->name = 'Main Recipient';
-        $recipient->email = 'to@test.com';
+        $sender = new Sender('System Sender', 'sender@test.com');
+        $recipient = new Person('Main Recipient', 'to@test.com');
 
         $mailer->addRecipients($sender, $recipient);
         $mailer->addText('Subject Test', 'Message Body');

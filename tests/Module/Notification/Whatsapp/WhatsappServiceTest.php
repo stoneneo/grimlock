@@ -5,7 +5,7 @@ namespace GorillaSoft\Grimlock\Tests\Module\Notification\Whatsapp;
 use GorillaSoft\Grimlock\Core\Collection\StringMap;
 use GorillaSoft\Grimlock\Core\Exception\CoreException;
 use GorillaSoft\Grimlock\Module\Notification\Whatsapp\Dto\Person;
-use GorillaSoft\Grimlock\Module\Notification\Whatsapp\WhatsappService;
+use GorillaSoft\Grimlock\Module\Notification\Whatsapp\Whatsapp;
 use GorillaSoft\Grimlock\Module\RestClient\Dto\Response;
 use GorillaSoft\Grimlock\Module\RestClient\RestClient;
 use PHPUnit\Framework\TestCase;
@@ -17,9 +17,9 @@ class WhatsappServiceTest extends TestCase
     private string $accessToken = 'EAAG...test_token';
     private string $phoneNumberId = '100099887766554';
 
-    private function injectMockRestClient(WhatsappService $service, RestClient $mockRestClient): void
+    private function injectMockRestClient(Whatsapp $service, RestClient $mockRestClient): void
     {
-        $reflection = new ReflectionClass(WhatsappService::class);
+        $reflection = new ReflectionClass(Whatsapp::class);
         $property = $reflection->getProperty('restClient');
         $property->setAccessible(true);
         $property->setValue($service, $mockRestClient);
@@ -28,22 +28,22 @@ class WhatsappServiceTest extends TestCase
     /**
      * @throws ReflectionException
      */
-    private function createServiceWithoutConstructor(): WhatsappService
+    private function createServiceWithoutConstructor(): Whatsapp
     {
-        $reflection = new ReflectionClass(WhatsappService::class);
+        $reflection = new ReflectionClass(Whatsapp::class);
         return $reflection->newInstanceWithoutConstructor();
     }
 
     public function testConstructorThrowsExceptionWhenAccessTokenIsEmpty(): void
     {
         $this->expectException(CoreException::class);
-        new WhatsappService('', $this->phoneNumberId);
+        new Whatsapp('', $this->phoneNumberId);
     }
 
     public function testConstructorThrowsExceptionWhenPhoneNumberIdIsEmpty(): void
     {
         $this->expectException(CoreException::class);
-        new WhatsappService($this->accessToken, '');
+        new Whatsapp($this->accessToken, '');
     }
 
     /**
@@ -61,7 +61,7 @@ class WhatsappServiceTest extends TestCase
         $mockRestClient->expects($this->once())
             ->method('post')
             ->with(
-                '/messages',
+                'messages',
                 [
                     'type' => 'text',
                     'to' => '51999888777',
@@ -76,9 +76,7 @@ class WhatsappServiceTest extends TestCase
 
         $this->injectMockRestClient($service, $mockRestClient);
 
-        $person = new Person();
-        $person->number = '51999888777';
-        $person->name = 'Ruben';
+        $person = new Person('Ruben', '51999888777');
 
         $placeholders = new StringMap();
         $placeholders->put('name', 'Ruben');
@@ -103,9 +101,7 @@ class WhatsappServiceTest extends TestCase
 
         $this->injectMockRestClient($service, $mockRestClient);
 
-        $person = new Person();
-        $person->name = 'Joe Doe';
-        $person->number = '51999888777';
+        $person = new Person('Joe Doe', '51999888777');
 
         $result = $service->sendMessage($person, 'Message Test');
         $this->assertFalse($result);
@@ -126,7 +122,7 @@ class WhatsappServiceTest extends TestCase
         $mockRestClient->expects($this->once())
             ->method('post')
             ->with(
-                '/messages',
+                'messages',
                 [
                     'type' => 'template',
                     'to' => '51999888777',
@@ -142,8 +138,7 @@ class WhatsappServiceTest extends TestCase
 
         $this->injectMockRestClient($service, $mockRestClient);
 
-        $person = new Person();
-        $person->number = '51999888777';
+        $person = new Person('', '51999888777');
 
         $result = $service->sendTemplate($person, 'hello_world');
         $this->assertTrue($result);
@@ -165,8 +160,7 @@ class WhatsappServiceTest extends TestCase
 
         $this->injectMockRestClient($service, $mockRestClient);
 
-        $person = new Person();
-        $person->number = '51999888777';
+        $person = new Person('', '51999888777');
 
         $result = $service->sendTemplate($person, 'hello_world');
         $this->assertFalse($result);

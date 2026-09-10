@@ -1,12 +1,15 @@
 <?php
 
-namespace GorillaSoft\Grimlock\Module\Notification\Whatsapp\Dto;
+namespace GorillaSoft\Grimlock\Module\Mailer\Dto;
 
+/**
+ *
+ */
 class Person
 {
     public function __construct(
         public string $name,
-        public string $number,
+        public string $email,
     ) {
     }
 

@@ -5,16 +5,13 @@ namespace GorillaSoft\Grimlock\Tests\Module\Pdf;
 use GorillaSoft\Grimlock\Core\Collection\Collection;
 use GorillaSoft\Grimlock\Core\Collection\HashMap;
 use GorillaSoft\Grimlock\Core\Collection\StringMap;
-use GorillaSoft\Grimlock\Core\Dto\Data;
-use GorillaSoft\Grimlock\Core\Dto\Param;
 use GorillaSoft\Grimlock\Core\Exception\CoreException;
-use GorillaSoft\Grimlock\Module\Mailer\Dto\MailPerson;
+use GorillaSoft\Grimlock\Module\Mailer\Dto\Person;
 use GorillaSoft\Grimlock\Module\Pdf\PdfGenerator;
 use PHPUnit\Framework\TestCase;
 
 class PdfGeneratorTest extends TestCase
 {
-
     /**
      * @throws CoreException
      */
@@ -28,12 +25,8 @@ class PdfGeneratorTest extends TestCase
         $placeholders = new StringMap();
         $placeholders->put('title', 'Grimlock Pdf Generator');
 
-        $batman = new MailPerson();
-        $batman->email = 'batman@example.com';
-        $batman->name = 'Batman';
-        $superman = new MailPerson();
-        $superman->email = 'superman@example.com';
-        $superman->name = 'Superman';
+        $batman = new Person('Batman', 'batman@example.com');
+        $superman = new Person('Superman', 'superman@example.com');
 
         //Variables
         $variables = new HashMap();

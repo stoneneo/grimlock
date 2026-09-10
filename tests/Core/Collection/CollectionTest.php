@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 class CollectionTest extends TestCase
 {
-
     /**
      * @throws CoreException
      */
@@ -27,8 +26,8 @@ class CollectionTest extends TestCase
         $object = "Object";
         $lArray->add($object);
 
-        $array =$lArray->jsonSerialize();
-        $this>self::assertNotEmpty($array);
+        $array = $lArray->jsonSerialize();
+        $this > self::assertNotEmpty($array);
     }
 
     /**

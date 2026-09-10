@@ -25,11 +25,15 @@
     "ext-json": "*",
     "ext-curl": "*",
     "google/auth": "^1.53.0",
-    "monolog/monolog": "^3.11.0",
-    "php": ">=8.4"
+    "monolog/monolog": "^3.12.0",
+    "php": ">=8.4",
+    "stripe/stripe-php": "^21.3"
   },
   "require-dev": {
-    "phpunit/phpunit": "^10.5.64"
+    "phpunit/phpunit": "^10.5.64",
+    "phpstan/phpstan": "^2.2",
+    "phpstan/extension-installer": "^1.4",
+    "friendsofphp/php-cs-fixer": "^3.95"
   },
   "autoload": {
     "psr-4": {
@@ -38,12 +42,15 @@
     }
   },
   "scripts": {
+    "stan": "phpstan analyse --memory-limit=1G",
+    "cs": "php-cs-fixer fix --dry-run --diff",
+    "cs:fix": "php-cs-fixer fix",
     "test": "phpunit",
-    "coverage": "phpunit --coverage-html=coverage --coverage-text"
+    "test:coverage": "phpunit --coverage-html=coverage --coverage-text"
   },
   "config": {
     "allow-plugins": {
-      "dealerdirect/phpcodesniffer-composer-installer": true
+      "phpstan/extension-installer": true
     }
   }
 }

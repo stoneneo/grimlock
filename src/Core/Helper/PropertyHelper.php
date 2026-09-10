@@ -7,7 +7,6 @@ use ReflectionProperty;
 
 class PropertyHelper
 {
-
     /**
      * @throws ReflectionException
      */

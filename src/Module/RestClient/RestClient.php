@@ -12,11 +12,14 @@ use GuzzleHttp\Exception\GuzzleException;
 /**
  *
  */
-class RestClient
+class RestClient implements RestClientInterface
 {
-
     private string $baseUri;
     private int $timeout;
+
+    /**
+     * @var StringMap<string>
+     */
     private StringMap $headers;
     private Client $client;
 
@@ -27,12 +30,13 @@ class RestClient
      */
     public function __construct(string $baseUri, int $timeout = 2, bool $sslEnabled = true)
     {
+        $this->baseUri = rtrim($baseUri, '/') . '/';
+
         $this->client = new Client([
-            'base_uri' => $baseUri,
+            'base_uri' => $this->baseUri,
             'timeout' => $timeout,
             'verify' => $sslEnabled,
         ]);
-        $this->baseUri = $baseUri;
         $this->timeout = $timeout;
         $this->headers = new StringMap();
     }
@@ -48,19 +52,24 @@ class RestClient
     }
 
     /**
-     * @return array
+     * @return array<string, string>
      */
-    private function getHeaders(): array {
+    private function getHeaders(): array
+    {
         return $this->headers->toArray();
     }
 
+
     /**
+     * @param string $uri
+     * @param array<string, string> $query
+     * @return Response
      * @throws CoreException
      */
-    public function get(string $uri, array $query = array()): Response
+    public function get(string $uri, array $query = []): Response
     {
         try {
-            $response = $this->client->request('GET', $this->baseUri . $uri, [
+            $response = $this->client->request('GET', ltrim($uri, '/'), [
                 'headers' => $this->getHeaders(),
                 'query' => $query,
                 'timeout' => $this->timeout
@@ -72,14 +81,39 @@ class RestClient
     }
 
     /**
+     * @param string $uri
+     * @param array<string, mixed> $body
+     * @return Response
      * @throws CoreException
      */
     public function post(string $uri, array $body): Response
     {
         try {
-            $response = $this->client->request('POST', $this->baseUri . $uri, [
+            $response = $this->client->request('POST', ltrim($uri, '/'), [
                'headers' => $this->getHeaders(),
-               'json' => $body
+               'json' => $body,
+               'timeout' => $this->timeout
+            ]);
+            return Response::create($response);
+        } catch (Exception|GuzzleException $e) {
+            throw new CoreException(self::class, $e->getMessage());
+        }
+    }
+
+
+    /**
+     * @param string $uri
+     * @param array<string, mixed> $body
+     * @return Response
+     * @throws CoreException
+     */
+    public function put(string $uri, array $body): Response
+    {
+        try {
+            $response = $this->client->request('PUT', ltrim($uri, '/'), [
+                'headers' => $this->getHeaders(),
+                'json' => $body,
+                'timeout' => $this->timeout
             ]);
             return Response::create($response);
         } catch (Exception|GuzzleException $e) {
@@ -88,14 +122,38 @@ class RestClient
     }
 
     /**
+     * @param string $uri
+     * @param array<string, mixed> $body
+     * @return Response
      * @throws CoreException
      */
-    public function put(string $uri, array $body): Response
+    public function patch(string $uri, array $body): Response
     {
         try {
-            $response = $this->client->request('PUT', $this->baseUri . $uri, [
+            $response = $this->client->request('PATCH', ltrim($uri, '/'), [
                 'headers' => $this->getHeaders(),
-                'json' => $body
+                'json' => $body,
+                'timeout' => $this->timeout
+            ]);
+            return Response::create($response);
+        } catch (Exception|GuzzleException $e) {
+            throw new CoreException(self::class, $e->getMessage());
+        }
+    }
+
+    /**
+     * @param string $uri
+     * @param array<string, string> $query
+     * @return Response
+     * @throws CoreException
+     */
+    public function delete(string $uri, array $query = []): Response
+    {
+        try {
+            $response = $this->client->request('DELETE', ltrim($uri, '/'), [
+                'headers' => $this->getHeaders(),
+                'query' => $query,
+                'timeout' => $this->timeout
             ]);
             return Response::create($response);
         } catch (Exception|GuzzleException $e) {

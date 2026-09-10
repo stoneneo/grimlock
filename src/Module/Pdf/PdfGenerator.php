@@ -19,9 +19,8 @@ use Throwable;
  * @package Grimlock
  * @author Rubén Darío Huamaní Ucharima
  */
-class PdfGenerator
+class PdfGenerator implements PdfGeneratorInterface
 {
-
     private Dompdf $pdf;
     private string $basePath;
 
@@ -37,8 +36,8 @@ class PdfGenerator
 
     /**
      * @param string $path
-     * @param StringMap $placeholders
-     * @param HashMap $variables
+     * @param StringMap<string> $placeholders
+     * @param HashMap<mixed> $variables
      * @param PdfSize $size
      * @param PdfOrientation $orientation
      * @return void
@@ -48,13 +47,6 @@ class PdfGenerator
     {
         try {
             $file = FileHelper::resolvePath($this->basePath, $path);
-            if ($size === null) {
-                throw new CoreException(self::class, 'Size PDF not exist');
-            }
-
-            if ($orientation === null) {
-                throw new CoreException(self::class, 'Orientation PDF not exist');
-            }
 
             $html = $this->renderTemplate($file, $placeholders, $variables);
 
@@ -103,7 +95,7 @@ class PdfGenerator
         }
 
         try {
-            $options = ['MailAttachment' => 1];
+            $options = ['Attachment' => 1];
             $this->pdf->stream($name, $options);
         } catch (Exception $e) {
             throw new CoreException(self::class, $e->getMessage());
@@ -112,12 +104,12 @@ class PdfGenerator
 
     /**
      * @param string $path
-     * @param StringMap|null $params
-     * @param HashMap|null $datas
+     * @param StringMap<string>|null $params
+     * @param HashMap<mixed>|null $variables
      * @return string
      * @throws CoreException
      */
-    private function renderTemplate(string $path, ?StringMap $params = null, ?HashMap $datas = null): string
+    private function renderTemplate(string $path, ?StringMap $params = null, ?HashMap $variables = null): string
     {
         $real = realpath($path);
         if ($real === false || !is_readable($real)) {
@@ -134,8 +126,8 @@ class PdfGenerator
             ob_start();
             try {
                 $data = [];
-                if ($datas !== null) {
-                    foreach ($datas as $key => $value) {
+                if ($variables !== null) {
+                    foreach ($variables as $key => $value) {
                         $data[$key] = $value;
                     }
                 }
@@ -152,6 +144,9 @@ class PdfGenerator
                     $e->getMessage(),
                     previous: $e
                 );
+            }
+            if ($html === false) {
+                throw new CoreException(self::class, 'Failed to capture template output buffer');
             }
 
             return TemplateHelper::replaceParams($html, $params);

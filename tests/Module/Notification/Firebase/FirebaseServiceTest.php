@@ -6,12 +6,12 @@ use Exception;
 use GorillaSoft\Grimlock\Core\Exception\CoreException;
 use GorillaSoft\Grimlock\Module\Notification\Firebase\Dto\Notification;
 use GorillaSoft\Grimlock\Module\Notification\Firebase\Dto\Person;
-use GorillaSoft\Grimlock\Module\Notification\Firebase\FirebaseService;
+use GorillaSoft\Grimlock\Module\Notification\Firebase\Firebase;
 use GorillaSoft\Grimlock\Module\RestClient\Dto\Response;
 use GorillaSoft\Grimlock\Module\RestClient\RestClient;
-
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use ReflectionException;
 
 class FirebaseServiceTest extends TestCase
 {
@@ -19,17 +19,20 @@ class FirebaseServiceTest extends TestCase
     private string $firebaseKey = 'credentials.json';
 
 
-    private function injectMockRestClient(FirebaseService $service, RestClient $mockRestClient): void
+    private function injectMockRestClient(Firebase $service, RestClient $mockRestClient): void
     {
-        $reflection = new ReflectionClass(FirebaseService::class);
+        $reflection = new ReflectionClass(Firebase::class);
         $property = $reflection->getProperty('restClient');
         $property->setAccessible(true);
         $property->setValue($service, $mockRestClient);
     }
 
-    private function createServiceWithoutConstructor(): FirebaseService
+    /**
+     * @throws ReflectionException
+     */
+    private function createServiceWithoutConstructor(): Firebase
     {
-        $reflection = new ReflectionClass(FirebaseService::class);
+        $reflection = new ReflectionClass(Firebase::class);
         $service = $reflection->newInstanceWithoutConstructor();
 
         $projectProp = $reflection->getProperty('firebaseProject');
@@ -42,15 +45,19 @@ class FirebaseServiceTest extends TestCase
     public function testConstructorThrowsExceptionWhenProjectIsEmpty(): void
     {
         $this->expectException(CoreException::class);
-        new FirebaseService('', $this->firebaseKey);
+        new Firebase('', $this->firebaseKey);
     }
 
     public function testConstructorThrowsExceptionWhenKeyIsEmpty(): void
     {
         $this->expectException(CoreException::class);
-        new FirebaseService($this->firebaseProject, '');
+        new Firebase($this->firebaseProject, '');
     }
 
+    /**
+     * @throws ReflectionException
+     * @throws CoreException
+     */
     public function testSendNotificationSuccess(): void
     {
         $service = $this->createServiceWithoutConstructor();
@@ -78,11 +85,7 @@ class FirebaseServiceTest extends TestCase
 
         $this->injectMockRestClient($service, $mockRestClient);
 
-        $notification = new Notification();
-        $notification->topic = 'news';
-        $notification->title = 'Title';
-        $notification->body = 'News';
-        $notification->image = 'https://image.com/news.jpg';
+        $notification = new Notification('Title', 'News', 'news', 'https://image.com/news.jpg');
 
         $result = $service->sendNotification($notification);
         $this->assertTrue($result);
@@ -92,13 +95,15 @@ class FirebaseServiceTest extends TestCase
     {
         $service = $this->createServiceWithoutConstructor();
 
-        $notification = new Notification();
-        $notification->title = '';
+        $notification = new Notification('');
 
         $this->expectException(CoreException::class);
         $service->sendNotification($notification);
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function testSendNotificationThrowsCoreExceptionOnRestClientError(): void
     {
         $service = $this->createServiceWithoutConstructor();
@@ -109,14 +114,16 @@ class FirebaseServiceTest extends TestCase
 
         $this->injectMockRestClient($service, $mockRestClient);
 
-        $notification = new Notification();
-        $notification->title = 'Title';
-        $notification->topic = '';
+        $notification = new Notification('Title', '', '');
 
         $this->expectException(CoreException::class);
         $service->sendNotification($notification);
     }
 
+    /**
+     * @throws ReflectionException
+     * @throws CoreException
+     */
     public function testSendNotificationPersonSuccessAndFormatsMessage(): void
     {
         $service = $this->createServiceWithoutConstructor();
@@ -142,26 +149,21 @@ class FirebaseServiceTest extends TestCase
 
         $this->injectMockRestClient($service, $mockRestClient);
 
-        $notification = new Notification();
-        $notification->title = 'Welcome';
-        $notification->body = 'Hello Joe Doe';
-        $notification->image = 'https://image.com/avatar.png';
-
-        $person = new Person();
-        $person->idRegistration = 'fcm_registration_token_123';
-        $person->name = 'Joe';
-        $person->lastname = 'Doe';
+        $notification = new Notification('Welcome', 'Hello Joe Doe', '', 'https://image.com/avatar.png');
+        $person = new Person('Joe', 'Doe', 'fcm_registration_token_123');
 
         $result = $service->sendNotificationPerson($notification, $person);
         $this->assertTrue($result);
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function testSendNotificationPersonThrowsExceptionWhenTitleIsNull(): void
     {
         $service = $this->createServiceWithoutConstructor();
 
-        $notification = new Notification();
-        $notification->title = '';
+        $notification = new Notification('');
 
         $person = new Person();
 

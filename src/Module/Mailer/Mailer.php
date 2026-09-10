@@ -7,10 +7,10 @@ use GorillaSoft\Grimlock\Core\Collection\StringMap;
 use GorillaSoft\Grimlock\Core\Exception\CoreException;
 use GorillaSoft\Grimlock\Core\Helper\TemplateHelper;
 use GorillaSoft\Grimlock\Core\Helper\PropertyHelper;
-use GorillaSoft\Grimlock\Module\Mailer\Core\MailSettings;
-use GorillaSoft\Grimlock\Module\Mailer\Dto\MailAttachment;
-use GorillaSoft\Grimlock\Module\Mailer\Dto\MailPerson;
-use GorillaSoft\Grimlock\Module\Mailer\Dto\MailSender;
+use GorillaSoft\Grimlock\Module\Mailer\Settings\Settings;
+use GorillaSoft\Grimlock\Module\Mailer\Dto\Attachment;
+use GorillaSoft\Grimlock\Module\Mailer\Dto\Person;
+use GorillaSoft\Grimlock\Module\Mailer\Dto\Sender;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 use ReflectionException;
@@ -19,35 +19,30 @@ use ReflectionException;
  * Class Mailer SMTP
  * @package Grimlock
  */
-class Mailer
+class Mailer implements MailerInterface
 {
-
     private PHPMailer $phpMailer;
 
 
     /**
-     * @param MailSettings $mailSettings
+     * @param Settings $mailSettings
      * @param bool $debug
      * @throws CoreException
      * @throws ReflectionException
      */
-    public function __construct(MailSettings $mailSettings, bool $debug = false)
+    public function __construct(Settings $mailSettings, bool $debug = false)
     {
-        if (!PropertyHelper::isNotEmpty($mailSettings, 'host'))
-        {
-            throw new CoreException(self::class,  'Mail Host not found or empty');
+        if (!PropertyHelper::isNotEmpty($mailSettings, 'host')) {
+            throw new CoreException(self::class, 'Mail Host not found or empty');
         }
-        if (!PropertyHelper::isNotEmpty($mailSettings, 'port'))
-        {
-            throw new CoreException(self::class,  'Mail Port not found or empty');
+        if (!PropertyHelper::isNotEmpty($mailSettings, 'port')) {
+            throw new CoreException(self::class, 'Mail Port not found or empty');
         }
-        if (!PropertyHelper::isNotEmpty($mailSettings, 'username'))
-        {
-            throw new CoreException(self::class,  'Mail User not found or empty');
+        if (!PropertyHelper::isNotEmpty($mailSettings, 'username')) {
+            throw new CoreException(self::class, 'Mail User not found or empty');
         }
-        if (!PropertyHelper::isNotEmpty($mailSettings, 'password'))
-        {
-            throw new CoreException(self::class,  'Mail Pass not found or empty');
+        if (!PropertyHelper::isNotEmpty($mailSettings, 'password')) {
+            throw new CoreException(self::class, 'Mail Pass not found or empty');
         }
 
         $this->phpMailer = new PHPMailer();
@@ -68,35 +63,35 @@ class Mailer
 
     /**
      *
-     * @param MailSender $mailSender
-     * @param MailPerson $mailPerson
-     * @param Collection<MailPerson>|null $lAddressCc
-     * @param Collection<MailPerson>|null $lAddressBcc
-     * @param Collection<MailAttachment>|null $lAttachments
+     * @param Sender $mailSender
+     * @param Person $mailPerson
+     * @param Collection<Person>|null $lAddressCc
+     * @param Collection<Person>|null $lAddressBcc
+     * @param Collection<Attachment>|null $lAttachments
      * @throws CoreException
      * @throws Exception
      */
-    public function addRecipients(MailSender $mailSender, MailPerson $mailPerson, ?Collection $lAddressCc = null, ?Collection $lAddressBcc = null, ?Collection $lAttachments = null): void
+    public function addRecipients(Sender $mailSender, Person $mailPerson, ?Collection $lAddressCc = null, ?Collection $lAddressBcc = null, ?Collection $lAttachments = null): void
     {
         $this->phpMailer->From = $mailSender->email;
         $this->phpMailer->FromName = $mailSender->name;
         $this->phpMailer->AddAddress($mailPerson->email, $mailPerson->name);
 
-        if($lAddressCc != null){
-            for ($i = 0; $i < $lAddressCc->size(); $i++){
+        if ($lAddressCc != null) {
+            for ($i = 0; $i < $lAddressCc->size(); $i++) {
                 $ccAddress = $lAddressCc->get($i);
                 $this->phpMailer->addCC($ccAddress->email, $ccAddress->name);
             }
         }
-        if($lAddressBcc != null){
-            for ($i = 0; $i < $lAddressBcc->size(); $i++){
+        if ($lAddressBcc != null) {
+            for ($i = 0; $i < $lAddressBcc->size(); $i++) {
                 $bccAddress = $lAddressBcc->get($i);
                 $this->phpMailer->addBCC($bccAddress->email, $bccAddress->name);
             }
         }
 
-        if($lAttachments != null){
-            for($i = 0; $i < $lAttachments->size(); $i++){
+        if ($lAttachments != null) {
+            for ($i = 0; $i < $lAttachments->size(); $i++) {
                 $bAttachment = $lAttachments->get($i);
                 $attachment = base64_decode($bAttachment->base64);
                 $this->phpMailer->addStringAttachment($attachment, $bAttachment->name, "base64", $bAttachment->type);
@@ -108,7 +103,7 @@ class Mailer
      * Generate Text
      * @param string $subject
      * @param string $text
-     * @param StringMap|null $params
+     * @param StringMap<string>|null $params
      * @return void
      */
     public function addText(string $subject, string $text, ?StringMap $params = null): void
@@ -121,7 +116,7 @@ class Mailer
      * Generate HTML
      * @param string $subject
      * @param string $html
-     * @param StringMap|null $params
+     * @param StringMap<string>|null $params
      */
     public function addHtml(string $subject, string $html, ?StringMap $params = null): void
     {
@@ -136,7 +131,7 @@ class Mailer
      */
     public function sendMail(): bool
     {
-        if (!PropertyHelper::isNotEmpty($this->phpMailer,'From')) {
+        if (!PropertyHelper::isNotEmpty($this->phpMailer, 'From')) {
             throw new CoreException(self::class, "From is not set");
         }
         if (!PropertyHelper::isNotEmpty($this->phpMailer, 'FromName')) {

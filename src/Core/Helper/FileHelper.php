@@ -12,7 +12,6 @@ use GorillaSoft\Grimlock\Core\Exception\CoreException;
  */
 class FileHelper
 {
-
     /**
      * @param string $basePath
      * @param string $path
@@ -41,7 +40,7 @@ class FileHelper
      * @param string $path
      * @return bool
      */
-    public static  function isAbsolutePath(string $path): bool
+    public static function isAbsolutePath(string $path): bool
     {
         return str_starts_with($path, '/') ||
             preg_match('/^[A-Z]:/i', $path) === 1;
@@ -49,10 +48,16 @@ class FileHelper
 
     /**
      * @return string
+     * @throws CoreException
      */
     public static function getCallerPath(): string
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+
+        if (!isset($trace[1]['file'])) {
+            throw new CoreException(self::class, 'Unable to determine caller file from backtrace');
+        }
+
         return dirname($trace[1]['file']);
     }
 

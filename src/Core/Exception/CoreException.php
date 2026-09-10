@@ -8,12 +8,10 @@ use Throwable;
 /**
  * Class CoreException
  * Grimlock's own exception to handle errors
- * @package Grimlock\Exception
  * @author Rubén Darío Huamaní Ucharima
  */
 class CoreException extends Exception
 {
-
     private string $class;
 
     /**

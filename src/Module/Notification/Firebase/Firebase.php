@@ -16,9 +16,8 @@ use GorillaSoft\Grimlock\Module\RestClient\RestClient;
 /**
  * @author Ruben Dario Huamani Ucharima
  */
-class FirebaseService
+class Firebase implements FirebaseInterface
 {
-
     private const string FIREBASE_SCOPE_MESSAGING = 'https://www.googleapis.com/auth/firebase.messaging';
     private const string FIREBASE_URL  = 'https://fcm.googleapis.com';
 
@@ -29,64 +28,64 @@ class FirebaseService
 
     /**
      * @param string $firebaseProject
-     * @param string $firebaseKey
+     * @param string $firebaseConfig
      * @throws CoreException
      */
-    public function __construct(string $firebaseProject, string $firebaseKey)
+    public function __construct(string $firebaseProject, string $firebaseConfig)
     {
-        if (empty($firebaseProject))
-        {
-            throw new CoreException(self::class,  'Parameter Construct Firebase Cloud Messaging Key');
+        if (empty($firebaseProject)) {
+            throw new CoreException(self::class, 'Firebase Project is empty.');
         }
-        if (empty($firebaseKey))
-        {
-            throw new CoreException(self::class,  'Parameter Construct Firebase Key');
+        if (empty($firebaseConfig)) {
+            throw new CoreException(self::class, 'Firebase Config is empty.');
         }
 
         $this->firebaseProject = $firebaseProject;
 
         //Get Google Firebase Access Token
         $path = FileHelper::getCallerPath();
-        $serviceAccountFile = FileHelper::resolvePath($path, $firebaseKey);
+        $serviceAccountFile = FileHelper::resolvePath($path, $firebaseConfig);
         $scopes = [self::FIREBASE_SCOPE_MESSAGING];
         $googleCredentials = new ServiceAccountCredentials($scopes, $serviceAccountFile);
         $token = $googleCredentials->fetchAuthToken();
         $accessToken = $token['access_token'];
 
         //Create Rest Client
-        $this->restClient = new RestClient(self::FIREBASE_URL,2);
+        $this->restClient = new RestClient(self::FIREBASE_URL, 2);
         $this->restClient->addHeader('Content-Length', '0');
         $this->restClient->addHeader('Authorization', 'Bearer ' . $accessToken);
     }
 
     /**
      * @param Notification $notification
-     * @param StringMap|null $params
+     * @param StringMap<string>|null $params
      * @return bool
      * @throws CoreException
      */
-    public function sendNotification(Notification $notification, ?StringMap $params = null): bool {
+    public function sendNotification(Notification $notification, ?StringMap $params = null): bool
+    {
         try {
             if (!PropertyHelper::isNotEmpty($notification, 'title')) {
-                throw new CoreException(self::class,  'Notification Title Not Null or Empty');
+                throw new CoreException(self::class, 'Notification Title Not Null or Empty');
             }
             if (!PropertyHelper::isNotEmpty($notification, 'body')) {
-                throw new CoreException(self::class,  'Notification Body Not Null or Empty');
+                throw new CoreException(self::class, 'Notification Body Not Null or Empty');
             }
 
+            $params ??= new StringMap();
             $title = TemplateHelper::replaceParams($notification->title, $params);
             $body = TemplateHelper::replaceParams($notification->body, $params);
 
-            $body = array(
-                'message' => array(
+            $body = [
+                'message' => [
                     'topic' => $notification->topic,
-                    'notification' => array(
+                    'notification' => [
                         'title' => $title,
                         'body' => $body,
                         'image' => $notification->image
-                    )
-                )
-            );
+                    ]
+                ]
+            ];
 
             $responseClient = $this->restClient->post('/v1/projects/'.$this->firebaseProject.'/messages:send', $body);
 
@@ -99,7 +98,7 @@ class FirebaseService
     /**
      * @param Notification $notification
      * @param Person $person
-     * @param StringMap|null $params
+     * @param StringMap<string>|null $params
      * @return bool
      * @throws CoreException
      */
@@ -107,22 +106,24 @@ class FirebaseService
     {
         try {
             if (!PropertyHelper::isNotEmpty($notification, 'title')) {
-                throw new CoreException(self::class,  'Notification Title Not Null or Empty');
+                throw new CoreException(self::class, 'Notification Title Not Null or Empty');
             }
             if (!PropertyHelper::isNotEmpty($notification, 'body')) {
-                throw new CoreException(self::class,  'Notification Body Not Null or Empty');
+                throw new CoreException(self::class, 'Notification Body Not Null or Empty');
             }
+
+            $params ??= new StringMap();
 
             $title = TemplateHelper::replaceParams($notification->title, $params);
             $body = TemplateHelper::replaceParams($notification->body, $params);
-            $body = array(
+            $body = [
                 'token' => $person->idRegistration,
-                'notification' => array(
+                'notification' => [
                     'title' => $title,
                     'body' => $body,
                     'image' => $notification->image
-                )
-            );
+                ]
+            ];
 
             $responseClient = $this->restClient->post('/v1/projects/'.$this->firebaseProject.'/messages:send', $body);
             return $responseClient->code === 200;
