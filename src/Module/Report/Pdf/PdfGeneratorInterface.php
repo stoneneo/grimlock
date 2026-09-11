@@ -1,11 +1,11 @@
 <?php
 
-namespace GorillaSoft\Grimlock\Module\Pdf;
+namespace GorillaSoft\Grimlock\Module\Report\Pdf;
 
 use GorillaSoft\Grimlock\Core\Collection\HashMap;
 use GorillaSoft\Grimlock\Core\Collection\StringMap;
-use GorillaSoft\Grimlock\Module\Pdf\Enum\PdfOrientation;
-use GorillaSoft\Grimlock\Module\Pdf\Enum\PdfSize;
+use GorillaSoft\Grimlock\Module\Report\Pdf\Enum\PdfOrientation;
+use GorillaSoft\Grimlock\Module\Report\Pdf\Enum\PdfSize;
 
 interface PdfGeneratorInterface
 {

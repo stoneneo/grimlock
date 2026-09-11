@@ -13,7 +13,7 @@ interface FirebaseInterface
      * @param StringMap<string>|null $params
      * @return bool
      */
-    public function sendNotification(Notification $notification, ?StringMap $params = null): bool;
+    public function sendTopic(Notification $notification, ?StringMap $params = null): bool;
 
     /**
      * @param Notification $notification
@@ -21,6 +21,6 @@ interface FirebaseInterface
      * @param StringMap<string>|null $params
      * @return bool
      */
-    public function sendNotificationPerson(Notification $notification, Person $person, ?StringMap $params = null): bool;
+    public function sendPerson(Notification $notification, Person $person, ?StringMap $params = null): bool;
 
 }

@@ -20,20 +20,26 @@ class FileHelper
      */
     public static function resolvePath(string $basePath, string $path): string
     {
-        if (self::isAbsolutePath($path)) {
-            $real = realpath($path);
-            if ($real !== false) {
-                return $real;
+        $combined = self::isAbsolutePath($path)
+            ? $path
+            : rtrim($basePath, '/\\') . DIRECTORY_SEPARATOR . ltrim($path, '/\\');
+
+        $real = realpath($combined);
+        if ($real !== false) {
+            if (!is_readable($real)) {
+                throw new CoreException(self::class, "File or directory not readable: $path");
             }
+            return $real;
         }
 
-        $absolute = $basePath . ltrim($path, '/');
-        $real = realpath($absolute);
-        if ($real === false || !is_readable($real)) {
-            throw new CoreException(self::class, "File not readable: $path");
+        $dir = dirname($combined);
+        $realDir = realpath($dir);
+
+        if ($realDir === false || !is_dir($realDir) || !is_readable($realDir)) {
+            throw new CoreException(self::class, "Directory not readable or does not exist: $dir");
         }
 
-        return $real;
+        return $realDir . DIRECTORY_SEPARATOR . basename($combined);
     }
 
     /**

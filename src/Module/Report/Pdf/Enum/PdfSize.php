@@ -1,6 +1,6 @@
 <?php
 
-namespace GorillaSoft\Grimlock\Module\Pdf\Enum;
+namespace GorillaSoft\Grimlock\Module\Report\Pdf\Enum;
 
 enum PdfSize: string
 {

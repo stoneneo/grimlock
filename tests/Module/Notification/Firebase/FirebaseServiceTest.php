@@ -87,7 +87,7 @@ class FirebaseServiceTest extends TestCase
 
         $notification = new Notification('Title', 'News', 'news', 'https://image.com/news.jpg');
 
-        $result = $service->sendNotification($notification);
+        $result = $service->sendTopic($notification);
         $this->assertTrue($result);
     }
 
@@ -98,7 +98,7 @@ class FirebaseServiceTest extends TestCase
         $notification = new Notification('');
 
         $this->expectException(CoreException::class);
-        $service->sendNotification($notification);
+        $service->sendTopic($notification);
     }
 
     /**
@@ -117,7 +117,7 @@ class FirebaseServiceTest extends TestCase
         $notification = new Notification('Title', '', '');
 
         $this->expectException(CoreException::class);
-        $service->sendNotification($notification);
+        $service->sendTopic($notification);
     }
 
     /**
@@ -152,7 +152,7 @@ class FirebaseServiceTest extends TestCase
         $notification = new Notification('Welcome', 'Hello Joe Doe', '', 'https://image.com/avatar.png');
         $person = new Person('Joe', 'Doe', 'fcm_registration_token_123');
 
-        $result = $service->sendNotificationPerson($notification, $person);
+        $result = $service->sendPerson($notification, $person);
         $this->assertTrue($result);
     }
 
@@ -168,7 +168,7 @@ class FirebaseServiceTest extends TestCase
         $person = new Person();
 
         $this->expectException(CoreException::class);
-        $service->sendNotificationPerson($notification, $person);
+        $service->sendPerson($notification, $person);
     }
 
 }

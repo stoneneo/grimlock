@@ -62,7 +62,7 @@ class Firebase implements FirebaseInterface
      * @return bool
      * @throws CoreException
      */
-    public function sendNotification(Notification $notification, ?StringMap $params = null): bool
+    public function sendTopic(Notification $notification, ?StringMap $params = null): bool
     {
         try {
             if (!PropertyHelper::isNotEmpty($notification, 'title')) {
@@ -102,7 +102,7 @@ class Firebase implements FirebaseInterface
      * @return bool
      * @throws CoreException
      */
-    public function sendNotificationPerson(Notification $notification, Person $person, ?StringMap $params = null): bool
+    public function sendPerson(Notification $notification, Person $person, ?StringMap $params = null): bool
     {
         try {
             if (!PropertyHelper::isNotEmpty($notification, 'title')) {

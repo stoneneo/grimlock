@@ -1,6 +1,6 @@
 <?php
 
-namespace GorillaSoft\Grimlock\Module\Pdf;
+namespace GorillaSoft\Grimlock\Module\Report\Pdf;
 
 use Dompdf\Dompdf;
 use Exception;
@@ -9,8 +9,8 @@ use GorillaSoft\Grimlock\Core\Collection\StringMap;
 use GorillaSoft\Grimlock\Core\Exception\CoreException;
 use GorillaSoft\Grimlock\Core\Helper\FileHelper;
 use GorillaSoft\Grimlock\Core\Helper\TemplateHelper;
-use GorillaSoft\Grimlock\Module\Pdf\Enum\PdfOrientation;
-use GorillaSoft\Grimlock\Module\Pdf\Enum\PdfSize;
+use GorillaSoft\Grimlock\Module\Report\Pdf\Enum\PdfOrientation;
+use GorillaSoft\Grimlock\Module\Report\Pdf\Enum\PdfSize;
 use Throwable;
 
 /**
@@ -84,6 +84,7 @@ class PdfGenerator implements PdfGeneratorInterface
     }
 
     /**
+     * Streams the PDF to the client.
      * @param string $name
      * @return void
      * @throws CoreException

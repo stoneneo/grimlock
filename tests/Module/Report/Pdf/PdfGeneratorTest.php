@@ -1,13 +1,13 @@
 <?php
 
-namespace GorillaSoft\Grimlock\Tests\Module\Pdf;
+namespace GorillaSoft\Grimlock\Tests\Module\Report\Pdf;
 
 use GorillaSoft\Grimlock\Core\Collection\Collection;
 use GorillaSoft\Grimlock\Core\Collection\HashMap;
 use GorillaSoft\Grimlock\Core\Collection\StringMap;
 use GorillaSoft\Grimlock\Core\Exception\CoreException;
 use GorillaSoft\Grimlock\Module\Mailer\Dto\Person;
-use GorillaSoft\Grimlock\Module\Pdf\PdfGenerator;
+use GorillaSoft\Grimlock\Module\Report\Pdf\PdfGenerator;
 use PHPUnit\Framework\TestCase;
 
 class PdfGeneratorTest extends TestCase

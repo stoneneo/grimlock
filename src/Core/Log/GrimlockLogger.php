@@ -31,6 +31,7 @@ class GrimlockLogger
         $filePath   = FileHelper::resolvePath($callerPath, $pathLog);
 
         $dir = dirname($filePath);
+
         if (!is_dir($dir) && !mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new CoreException(self::class, "Failed to create log directory: $dir");
         }
