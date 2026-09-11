@@ -3,16 +3,17 @@
 namespace GorillaSoft\Grimlock\Core\Log;
 
 use GorillaSoft\Grimlock\Core\Exception\CoreException;
+use GorillaSoft\Grimlock\Core\Helper\FileHelper;
 use GorillaSoft\Grimlock\Core\Log\Enum\LevelLog;
-use GorillaSoft\Grimlock\Core\Util\AppUtil;
-use Monolog\Handler\StreamHandler;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\RotatingFileHandler;
 use Monolog\Logger;
 
 class GrimlockLogger
 {
     private static ?GrimlockLogger $instance = null;
 
-    private GrimlockLogger $logger;
+    private Logger $logger;
 
 
     /**
@@ -21,20 +22,28 @@ class GrimlockLogger
     private function __construct(string $pathLog, LevelLog $level, string $appLog)
     {
         if (trim($pathLog) === '') {
-            throw new CoreException(self::class, 'Grimlock Path Log cannot be empty');
+            throw new CoreException(self::class, 'Path Log cannot be empty');
         }
 
-        $this->logger = new GrimlockLogger($appLog);
+        $this->logger = new Logger($appLog);
 
-        $callerPath = AppUtil::getCallerPath();
-        $filePath   = AppUtil::resolvePath($callerPath, $pathLog);
+        $callerPath = FileHelper::getCallerPath();
+        $filePath   = FileHelper::resolvePath($callerPath, $pathLog);
 
         $dir = dirname($filePath);
+
         if (!is_dir($dir) && !mkdir($dir, 0777, true) && !is_dir($dir)) {
             throw new CoreException(self::class, "Failed to create log directory: $dir");
         }
 
-        $this->logger->pushHandler(new StreamHandler($filePath, $level->value));
+        $handler = new RotatingFileHandler($filePath, 7, $level->value);
+        $dateFormat = "Y-m-d H:i:s";
+        $output = "[%datetime%][%level_name%]%message% %context% %extra%\n";
+        $formatter = new LineFormatter($output, $dateFormat, true, true);
+        $formatter->ignoreEmptyContextAndExtra();
+
+        $handler->setFormatter($formatter);
+        $this->logger->pushHandler($handler);
     }
 
     /**
@@ -65,10 +74,10 @@ class GrimlockLogger
     /**
      * @throws CoreException
      */
-    private static function logGuard(): GrimlockLogger
+    private static function append(): Logger
     {
         if (self::$instance === null) {
-            throw new CoreException(self::class, 'GrimlockLogger not initialized.');
+            throw new CoreException(self::class, 'GrimlockLogger not initialized. Call GrimlockLogger::init() first.');
         }
 
         return self::$instance->logger;
@@ -77,48 +86,18 @@ class GrimlockLogger
     /**
      * @throws CoreException
      */
-    public static function error(string $message): void
+    public static function log(LevelLog $levelLog, string $message): void
     {
-        self::logGuard()->error($message);
+        match ($levelLog) {
+            LevelLog::Info  => self::append()->info($message),
+            LevelLog::Notice => self::append()->notice($message),
+            LevelLog::Debug => self::append()->debug($message),
+            LevelLog::Warning => self::append()->warning($message),
+            LevelLog::Alert => self::append()->alert($message),
+            LevelLog::Critical => self::append()->critical($message),
+            LevelLog::Emergency => self::append()->emergency($message),
+            LevelLog::Error => self::append()->error($message),
+        };
     }
 
-    /**
-     * @throws CoreException
-     */
-    public static function info(string $message): void
-    {
-        self::logGuard()->info($message);
-    }
-
-    /**
-     * @throws CoreException
-     */
-    public static function debug(string $message): void
-    {
-        self::logGuard()->debug($message);
-    }
-
-    /**
-     * @throws CoreException
-     */
-    public static function warn(string $message): void
-    {
-        self::logGuard()->warning($message);
-    }
-
-    /**
-     * @throws CoreException
-     */
-    public static function notice(string $message): void
-    {
-        self::logGuard()->notice($message);
-    }
-
-    /**
-     * @throws CoreException
-     */
-    public static function critical(string $message): void
-    {
-        self::logGuard()->critical($message);
-    }
 }

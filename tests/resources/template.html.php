@@ -12,10 +12,14 @@
         </style>
     </head>
     <body>
-        <h1>Demo PDF {{name}}</h1>
+        <h1>Demo :title</h1>
         <?php
-        $name = "";
-        echo "Hello, " . $name . "!";
+        echo "Hello, " . $name . "! <br />";
+        echo '<ul>';
+        foreach ($superheroes as $superheroe) {
+            echo '<li>' . $superheroe->name . '</li>';
+        }
+        echo '</ul>';
         ?>
     </body>
 </html>
