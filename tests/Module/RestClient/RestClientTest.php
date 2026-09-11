@@ -18,7 +18,7 @@ class RestClientTest extends TestCase
      */
     public function testGetReturnsGrimlockResponse(): void
     {
-        $baseUri = 'https://api.test';
+        $baseUri = 'https://api.test/';
         $client = new RestClient($baseUri, 2, false);
         $client->addHeader('X-Test', 'value');
 
@@ -35,7 +35,7 @@ class RestClientTest extends TestCase
             ->method('request')
             ->with(
                 'GET',
-                $baseUri . '/resource',
+                'resource',
                 $this->callback(function ($options) {
                     TestCase::assertArrayHasKey('headers', $options);
                     TestCase::assertArrayHasKey('X-Test', $options['headers']);
@@ -63,7 +63,7 @@ class RestClientTest extends TestCase
      */
     public function testPostSendsJsonAndReturnsResponse(): void
     {
-        $baseUri = 'https://api.test';
+        $baseUri = 'https://api.test/';
         $client = new RestClient($baseUri);
 
         $mockStream = $this->createMock(StreamInterface::class);
@@ -79,7 +79,7 @@ class RestClientTest extends TestCase
             ->method('request')
             ->with(
                 'POST',
-                $baseUri . '/create',
+                'create',
                 $this->callback(function ($options) {
                     TestCase::assertArrayHasKey('headers', $options);
                     TestCase::assertArrayHasKey('json', $options);
@@ -104,7 +104,7 @@ class RestClientTest extends TestCase
      */
     public function testPutSendsJsonAndReturnsResponse(): void
     {
-        $baseUri = 'https://api.test';
+        $baseUri = 'https://api.test/';
         $client = new RestClient($baseUri);
 
         $mockStream = $this->createMock(StreamInterface::class);
@@ -120,7 +120,7 @@ class RestClientTest extends TestCase
             ->method('request')
             ->with(
                 'PUT',
-                $baseUri . '/update',
+                'update',
                 $this->callback(function ($options) {
                     TestCase::assertArrayHasKey('headers', $options);
                     TestCase::assertArrayHasKey('json', $options);
